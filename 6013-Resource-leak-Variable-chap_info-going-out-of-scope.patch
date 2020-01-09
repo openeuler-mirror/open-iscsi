@@ -1,0 +1,26 @@
+From 020d46c3cb95d627bd1246e6212981cf22adf651 Mon Sep 17 00:00:00 2001
+From: Chris Leech <cleech@redhat.com>
+Date: Wed, 30 Oct 2019 13:50:22 -0700
+Subject: [PATCH 30/43] Resource leak: Variable chap_info going out of scope
+ leaks the storage it points to.
+
+---
+ usr/iscsiadm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usr/iscsiadm.c b/usr/iscsiadm.c
+index 2ce6ae7..efc9f43 100644
+--- a/usr/iscsiadm.c
++++ b/usr/iscsiadm.c
+@@ -1734,7 +1734,7 @@ static int set_host_chap_info(uint32_t host_no, uint64_t chap_index,
+ 			rc = ISCSI_ERR;
+ 		}
+ 
+-		goto exit_set_chap;
++		goto free_iovec;
+ 	}
+ 
+ 	ipc->ctldev_close();
+-- 
+2.19.1
+

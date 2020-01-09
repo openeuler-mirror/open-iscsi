@@ -1,0 +1,28 @@
+From 4ee991b81194a7e3ebd7ff6ec4efc5509932389d Mon Sep 17 00:00:00 2001
+From: Lee Duncan <lduncan@suse.com>
+Date: Tue, 14 May 2019 14:12:25 -0700
+Subject: [PATCH 91/91] Fix possible discovery hang when timing out
+
+If session reopening failed during discovery, the CPU
+could peg at 100% because the code that gives up when
+tretires are exhausted was not setting an error
+return value.
+---
+ usr/discovery.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/usr/discovery.c b/usr/discovery.c
+index 2147deb..199c160 100644
+--- a/usr/discovery.c
++++ b/usr/discovery.c
+@@ -1355,6 +1355,7 @@ reconnect:
+ 	if (--session->reopen_cnt < 0) {
+ 		log_error("connection login retries (reopen_max) %d exceeded",
+ 			  config->reopen_max);
++		rc = ISCSI_ERR_PDU_TIMEOUT;
+ 		goto login_failed;
+ 	}
+ 
+-- 
+1.8.3.1
+

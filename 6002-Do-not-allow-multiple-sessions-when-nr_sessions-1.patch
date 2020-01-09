@@ -1,0 +1,37 @@
+From a37c4295a2e3f8712921a52db0d35d3506efb19b Mon Sep 17 00:00:00 2001
+From: Lee Duncan <lduncan@suse.com>
+Date: Thu, 4 Oct 2018 16:26:26 -0700
+Subject: [PATCH 60/91] Do not allow multiple sessions when nr_sessions=1
+
+If a request is made to login to a target, creating
+a session, then another request is submitted so quickly
+that the first one has not completed, both  requests
+can succeed, despite having nr_sessions=1 configured.
+
+Only allow multiple login requests if nr_sessions is
+greater than 1.
+---
+ usr/session_mgmt.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/usr/session_mgmt.c b/usr/session_mgmt.c
+index 596085b..0500f15 100644
+--- a/usr/session_mgmt.c
++++ b/usr/session_mgmt.c
+@@ -189,9 +189,11 @@ int iscsi_login_portal(void *data, struct list_head *list, struct node_rec *rec)
+ 
+ 	/*
+ 	 * Ensure the record's 'multiple' flag is set so __iscsi_login_portal
+-	 * will allow multiple logins.
++	 * will allow multiple logins, but only if configured for more
++	 * than one 
+ 	 */
+-	rec->session.multiple = 1;
++	if (rec->session.nr_sessions > 1)
++		rec->session.multiple = 1;
+ 	for (i = session_count; i < rec->session.nr_sessions; ++i) {
+ 		log_debug(1, "%s: Creating session %d/%d", rec->iface.name,
+ 			  i + 1, rec->session.nr_sessions);
+-- 
+1.8.3.1
+

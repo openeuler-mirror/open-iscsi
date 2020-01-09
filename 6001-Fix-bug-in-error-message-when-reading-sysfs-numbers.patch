@@ -1,0 +1,28 @@
+From 8bf04a094e572c56d4f8bd30ff064c84c75a0247 Mon Sep 17 00:00:00 2001
+From: Lee Duncan <lduncan@suse.com>
+Date: Tue, 25 Sep 2018 09:53:55 -0700
+Subject: [PATCH 54/91] Fix bug in error message when reading sysfs numbers.
+
+The message printed when ENOENT was returned for
+a number-type sysfs value was missing the attribute
+name parameter.
+---
+ libopeniscsiusr/sysfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libopeniscsiusr/sysfs.c b/libopeniscsiusr/sysfs.c
+index c4f89a3..5e6532e 100644
+--- a/libopeniscsiusr/sysfs.c
++++ b/libopeniscsiusr/sysfs.c
+@@ -237,7 +237,7 @@ static int iscsi_sysfs_prop_get_ll(struct iscsi_context *ctx,
+ 				       "Failed to read '%s': "
+ 				      "File '%s' does not exists, using ",
+ 				      "default value %lld",
+-				      file_path, default_value);
++				      prop_name, file_path, default_value);
+ 				*val = default_value;
+ 				goto out;
+ 			}
+-- 
+1.8.3.1
+

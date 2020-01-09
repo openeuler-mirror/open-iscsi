@@ -1,0 +1,27 @@
+From e1d19f028533f5cc20d61121b425891009eddd48 Mon Sep 17 00:00:00 2001
+From: openEuler Buildteam <buildteam@openeuler.org>
+Date: Fri, 23 Aug 2019 19:12:13 +0800
+Subject: [PATCH] modify iscsi initiatorname
+
+---
+ utils/iscsi-iname.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/utils/iscsi-iname.c b/utils/iscsi-iname.c
+index 6347edc..ebcf96c 100644
+--- a/utils/iscsi-iname.c
++++ b/utils/iscsi-iname.c
+@@ -132,8 +132,8 @@ main(int argc, char *argv[])
+ 	}
+ 
+ 	/* print the prefix followed by 6 bytes of the MD5 hash */
+-	sprintf(iname, "%s:%x%x%x%x%x%x", prefix,
+-		bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5]);
++	sprintf(iname, "%s:node", prefix);
++
+ 
+ 	iname[sizeof (iname) - 1] = '\0';
+ 	printf("%s\n", iname);
+-- 
+1.8.3.1
+

@@ -1,0 +1,23 @@
+From 8badb69eb47e3c93619fccf5667a0d681b5a34a6 Mon Sep 17 00:00:00 2001
+From: openEuler Buildteam <buildteam@openeuler.org>
+Date: Wed, 8 Jan 2020 03:33:14 -0500
+Subject: [PATCH] iscsi-initiator-utils: add sleep for service
+
+---
+ etc/systemd/iscsid.service | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/etc/systemd/iscsid.service b/etc/systemd/iscsid.service
+index 4fef168..8df224e 100644
+--- a/etc/systemd/iscsid.service
++++ b/etc/systemd/iscsid.service
+@@ -9,6 +9,7 @@ Before=remote-fs-pre.target
+ Type=notify
+ NotifyAccess=main
+ ExecStart=/sbin/iscsid -f
++ExecStartPost=/usr/bin/sleep 1
+ KillMode=mixed
+ Restart=on-failure
+ 
+-- 
+1.8.3.1

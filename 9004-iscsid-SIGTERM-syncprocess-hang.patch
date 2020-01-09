@@ -1,0 +1,76 @@
+From 1f4eb61f62a4f4245ddfd61440eb679f65ae8194 Mon Sep 17 00:00:00 2001
+From: pengyeqing <pengyeqing@huawei.com>
+Date: Sat, 26 Jan 2019 23:41:05 +0800
+Subject: [PATCH] iscsi-initiator-utils: iscsid SIGTERM syncprocess hang
+
+reason:iscsid SIGTERM syncprocess hang
+
+Signed-off-by: pengyeqing <pengyeqing@huawei.com>
+---
+ usr/iscsid.c     |  2 ++
+ usr/iscsid_req.c | 10 ++++++++++
+ usr/iscsid_req.h |  1 +
+ 3 files changed, 13 insertions(+)
+
+diff --git a/usr/iscsid.c b/usr/iscsid.c
+index b95917d..48d0f52 100644
+--- a/usr/iscsid.c
++++ b/usr/iscsid.c
+@@ -39,6 +39,7 @@
+ #include "mgmt_ipc.h"
+ #include "event_poll.h"
+ #include "iscsi_ipc.h"
++#include "iscsid_req.h"
+ #include "log.h"
+ #include "iscsi_util.h"
+ #include "initiator.h"
+@@ -314,6 +315,7 @@ static void catch_signal(int signo)
+ 	switch (signo) {
+ 	case SIGTERM:
+ 		event_loop_exit(NULL);
++		signal_term_in();
+ 		break;
+ 	default:
+ 		break;
+diff --git a/usr/iscsid_req.c b/usr/iscsid_req.c
+index d18b14d..76aa035 100644
+--- a/usr/iscsid_req.c
++++ b/usr/iscsid_req.c
+@@ -37,6 +37,13 @@
+ #include "iscsid_req.h"
+ #include "uip_mgmt_ipc.h"
+ 
++static int sigterm_in;
++
++void signal_term_in()
++{
++	sigterm_in= 1;
++}
++
+ static void iscsid_startup(void)
+ {
+ 	char *startup_cmd;
+@@ -145,6 +152,9 @@ int iscsid_response(int fd, iscsiadm_cmd_e cmd, iscsiadm_rsp_t *rsp,
+ 	while (len) {
+ 		struct pollfd pfd;
+ 
++		if (sigterm_in)
++			return ISCSI_ERR_ISCSID_COMM_ERR;
++
+ 		pfd.fd = fd;
+ 		pfd.events = POLLIN;
+ 		err = poll(&pfd, 1, timeout);
+diff --git a/usr/iscsid_req.h b/usr/iscsid_req.h
+index d580ed2..6f139a8 100644
+--- a/usr/iscsid_req.h
++++ b/usr/iscsid_req.h
+@@ -41,5 +41,6 @@ extern int iscsid_req_by_sid(iscsiadm_cmd_e cmd, int sid);
+ 
+ extern int uip_broadcast(void *buf, size_t buf_len, int fd_flags,
+ 			 uint32_t *status);
++extern void signal_term_in(void);
+ 
+ #endif
+-- 
+1.8.3.1
+

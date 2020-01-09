@@ -1,0 +1,65 @@
+From ae0b2ceb620e2bf527c06d21c110791d1e0e8bf4 Mon Sep 17 00:00:00 2001
+From: Lee Duncan <lduncan@suse.com>
+Date: Tue, 25 Sep 2018 09:57:46 -0700
+Subject: [PATCH 10/87] Handle ENOTCONN error separately when reading sysfs
+ values.
+
+This error happens when the daemon is attempting to
+reconnect a session when starting up, so should not
+be considered an internal error.
+---
+ libopeniscsiusr/sysfs.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/libopeniscsiusr/sysfs.c b/libopeniscsiusr/sysfs.c
+index 5e6532e..2c3f077 100644
+--- a/libopeniscsiusr/sysfs.c
++++ b/libopeniscsiusr/sysfs.c
+@@ -184,6 +184,21 @@ int _sysfs_prop_get_str(struct iscsi_context *ctx, const char *dir_path,
+ 			_error(ctx, "Failed to read '%s': "
+ 			       "permission deny when reading '%s'", prop_name,
+ 			       file_path);
++		} else if (errno_save == ENOTCONN) {
++			if (default_value == NULL) {
++				rc = LIBISCSI_ERR_SYSFS_LOOKUP;
++				_error(ctx, "Failed to read '%s': "
++				       "error when reading '%s': "
++				       "Target unavailable",
++				       prop_name, file_path);
++			} else {
++				_info(ctx, "Failed to read '%s': "
++				       "error when reading '%s': "
++				       "Target unavailable, using default value '%s'",
++				       prop_name, file_path, default_value);
++				memcpy(buff, (void *) default_value,
++				       strlen(default_value) + 1);
++			}
+ 		} else {
+ 			rc = LIBISCSI_ERR_BUG;
+ 			_error(ctx, "Failed to read '%s': "
+@@ -246,6 +261,22 @@ static int iscsi_sysfs_prop_get_ll(struct iscsi_context *ctx,
+ 			_error(ctx, "Permission deny when reading '%s'",
+ 			       file_path);
+ 			goto out;
++		} else if (errno_save == ENOTCONN) {
++			if (!ignore_error) {
++				rc = LIBISCSI_ERR_SYSFS_LOOKUP;
++				_error(ctx, "Failed to read '%s': "
++					"error when reading '%s': "
++					"Target unavailable",
++					prop_name, file_path);
++				goto out;
++			} else {
++				_info(ctx, "Failed to read '%s': "
++					"error when reading '%s': "
++					"Target unavailable, using default value %lld",
++					prop_name, file_path, default_value);
++				*val = default_value;
++				goto out;
++			}
+ 		} else {
+ 			rc = LIBISCSI_ERR_BUG;
+ 			_error(ctx, "Error when reading '%s': %d", file_path,
+-- 
+1.8.3.1
+

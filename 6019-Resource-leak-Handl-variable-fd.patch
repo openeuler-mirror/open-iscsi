@@ -1,0 +1,25 @@
+From 504b990bc886d708ae673ac1fa0e09e7911c2823 Mon Sep 17 00:00:00 2001
+From: Chris Leech <cleech@redhat.com>
+Date: Thu, 31 Oct 2019 15:08:40 -0700
+Subject: [PATCH 40/43] Resource leak: Handle variable fd going out of scope
+ leaks the handle.
+
+---
+ iscsiuio/src/unix/main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/iscsiuio/src/unix/main.c b/iscsiuio/src/unix/main.c
+index 5168e4e..5e3f66c 100644
+--- a/iscsiuio/src/unix/main.c
++++ b/iscsiuio/src/unix/main.c
+@@ -196,6 +196,7 @@ static void daemon_init()
+ 	dup2(fd, 2);
+ 	setsid();
+ 	chdir("/");
++	close(fd);
+ }
+ 
+ #define ISCSI_OOM_PATH_LEN 48
+-- 
+2.21.0
+
