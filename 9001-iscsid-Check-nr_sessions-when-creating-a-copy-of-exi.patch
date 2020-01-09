@@ -1,0 +1,109 @@
+From 47849daf73c1978491c05e9619063ff8a529ca48 Mon Sep 17 00:00:00 2001
+From: Tang Chen <tang.chen@huawei.com>
+Date: Thu, 12 Oct 2017 04:56:16 +0800
+Subject: [PATCH 1/1] iscsid: Check nr_sessions when creating a copy of
+ existing session
+
+For multipath configurations, you may want more than one session to be
+created on each iface record.  If node.session.nr_sessions is greater
+than 1, performing a 'login' for that node will ensure that the
+appropriate number of sessions is created.
+
+        node.session.nr_sessions = 1
+
+In iscsiadm command, we set session.multiple to 1, which means we can
+create multiple copies of an existing session.
+
+iscsi_login_portal()
+|--> rec->session.multiple = 1
+
+But in iscsid, we didn't check nr_sessions when executing login task.
+
+__session_login_task()
+|--> session_is_running()
+         |--> iscsi_sysfs_for_each_session()
+|--> if (rec->session.multiple)
+                 log_debug(2, "Adding a copy of an existing session");
+
+So this patch adds a checking to iscsid login task.
+
+Signed-off-by: Tang Chen <tang.chen@huawei.com>
+
+---
+ usr/initiator.c | 31 ++++++++++++++++++-------------
+ 1 files changed, 18 insertions(+), 13 deletions(-)
+
+diff --git a/usr/initiator.c b/usr/initiator.c
+index a86d1e6..9248962 100644
+--- a/usr/initiator.c
++++ b/usr/initiator.c
+@@ -1754,10 +1754,11 @@ static int iscsi_sched_ev_context(struct iscsi_ev_context *ev_context,
+ 	return 0;
+ }
+ 
+-static iscsi_session_t* session_find_by_rec(node_rec_t *rec)
++static int session_find_by_rec(node_rec_t *rec)
+ {
+ 	struct iscsi_transport *t;
+ 	iscsi_session_t *session;
++	int nr_found = 0;
+ 
+ 	list_for_each_entry(t, &transports, list) {
+ 		list_for_each_entry(session, &t->sessions, list) {
+@@ -1766,24 +1767,23 @@ static iscsi_session_t* session_find_by_rec(node_rec_t *rec)
+ 					 session->nrec.conn[0].port,
+ 					 &session->nrec.iface,
+ 					 MATCH_ANY_SID))
+-				return session;
++				nr_found++;
+ 		}
+ 	}
+-	return NULL;
++	return nr_found;
+ }
+ 
+ /*
+  * a session could be running in the kernel but not in iscsid
+  * due to a resync or because some other app started the session
+  */
+-static int session_is_running(node_rec_t *rec)
++static int session_is_running(node_rec_t *rec, int *nr_found)
+ {
+-	int nr_found = 0;
+-
+-	if (session_find_by_rec(rec))
++	*nr_found = session_find_by_rec(rec);
++	if (*nr_found)
+ 		return 1;
+ 
+-	if (iscsi_sysfs_for_each_session(rec, &nr_found, iscsi_match_session,
++	if (iscsi_sysfs_for_each_session(rec, nr_found, iscsi_match_session,
+ 					 0))
+ 		return 1;
+ 
+@@ -1795,12 +1795,17 @@ static int __session_login_task(node_rec_t *rec, queue_task_t *qtask)
+ 	iscsi_session_t *session;
+ 	iscsi_conn_t *conn;
+ 	struct iscsi_transport *t;
+-	int rc;
+-
+-	if (session_is_running(rec)) {
+-		if (rec->session.multiple)
++	int rc, nr_found = 0;
++
++	if (session_is_running(rec, &nr_found)) {
++		if (rec->session.multiple) {
++			if (nr_found >= rec->session.nr_sessions) {
++				log_debug(2, "Cannot add more copy of session,"
++						" %d found.\n", nr_found);
++				return ISCSI_ERR_SESS_EXISTS;
++			}
+ 			log_debug(2, "Adding a copy of an existing session");
+-		else
++		} else
+ 			return ISCSI_ERR_SESS_EXISTS;
+ 	}
+ 
+-- 
+1.8.3.1
+

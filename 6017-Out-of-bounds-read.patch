@@ -1,0 +1,35 @@
+From de0680b4f46f767c34a4a503dadcb24135c21cb6 Mon Sep 17 00:00:00 2001
+From: Chris Leech <cleech@redhat.com>
+Date: Wed, 30 Oct 2019 14:12:16 -0700
+Subject: [PATCH 34/43] Out-of-bounds read: Overrunning array of 4 bytes at
+ byte offset 7 by dereferencing pointer
+
+---
+ iscsiuio/src/unix/libs/qedi.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/iscsiuio/src/unix/libs/qedi.c b/iscsiuio/src/unix/libs/qedi.c
+index b7595d5..3414cb5 100644
+--- a/iscsiuio/src/unix/libs/qedi.c
++++ b/iscsiuio/src/unix/libs/qedi.c
+@@ -442,7 +442,7 @@ static int qedi_open(nic_t *nic)
+ 	qedi_t *bp = NULL;
+ 	struct stat uio_stat;
+ 	int i, rc;
+-	int count;
++	size_t count;
+ 	uint32_t bus;
+ 	uint32_t slot;
+ 	uint32_t func;
+@@ -666,7 +666,7 @@ static int qedi_open(nic_t *nic)
+ 		 nic->mac_addr[0], nic->mac_addr[1], nic->mac_addr[2],
+ 		 nic->mac_addr[3], nic->mac_addr[4], nic->mac_addr[5]);
+ 
+-	qedi_get_library_name(&nic->library_name, (size_t *)&count);
++	qedi_get_library_name(&nic->library_name, &count);
+ 	LOG_INFO("%s: qedi initialized", nic->log_name);
+ 
+ 	bp->flags |= QEDI_OPENED;
+-- 
+2.21.0
+

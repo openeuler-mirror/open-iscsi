@@ -1,0 +1,26 @@
+From 5799a5a711a0347e353cfb61b8ea33eb9d38541e Mon Sep 17 00:00:00 2001
+From: Chris Leech <cleech@redhat.com>
+Date: Wed, 30 Oct 2019 12:03:59 -0700
+Subject: [PATCH 24/43] Resource leak: Variable startup_cmd going out of scope
+ leaks the storage it point to.
+
+---
+ usr/iscsid_req.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/usr/iscsid_req.c b/usr/iscsid_req.c
+index b6940db..427e894 100644
+--- a/usr/iscsid_req.c
++++ b/usr/iscsid_req.c
+@@ -55,6 +55,8 @@ static void iscsid_startup(void)
+ 	if (system(startup_cmd) < 0)
+ 		log_error("Could not execute '%s' (err %d)",
+ 			  startup_cmd, errno);
++
++	free(startup_cmd);
+ }
+ 
+ #define MAXSLEEP 128
+-- 
+2.21.0
+

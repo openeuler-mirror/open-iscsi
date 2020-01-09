@@ -1,0 +1,29 @@
+From ca6eb221321c0e24b94f667ecc75a5fc17aa2018 Mon Sep 17 00:00:00 2001
+From: Chris Leech <cleech@redhat.com>
+Date: Wed, 30 Oct 2019 13:59:31 -0700
+Subject: [PATCH 32/43] Resource leak: Handle variable fd going out of scope
+ leaks the handle.
+
+This is comming up in places where the error handling assumes that on a
+failure there is no file descriptor to worry about.  I don't think we
+need to keep fd around when indicating a connection error.
+---
+ usr/iscsid_req.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/usr/iscsid_req.c b/usr/iscsid_req.c
+index 427e894..d872eb7 100644
+--- a/usr/iscsid_req.c
++++ b/usr/iscsid_req.c
+@@ -97,6 +97,8 @@ static int ipc_connect(int *fd, char *unix_sock_name, int start_iscsid)
+ 		if (nsec <= MAXSLEEP/2)
+ 			sleep(nsec);
+ 	}
++	close(*fd);
++	*fd = -1;
+ 	log_error("can not connect to iSCSI daemon (%d)!", errno);
+ 	return ISCSI_ERR_ISCSID_NOTCONN;
+ }
+-- 
+2.21.0
+

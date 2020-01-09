@@ -1,0 +1,35 @@
+From e13d2fe2b39d6a69b7a7c82cdc3185996bceaca2 Mon Sep 17 00:00:00 2001
+From: Chris Leech <cleech@redhat.com>
+Date: Wed, 30 Oct 2019 11:06:07 -0700
+Subject: [PATCH 18/43] Resource leak: returning without freeing netdev
+
+---
+ usr/iscsi_net_util.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/usr/iscsi_net_util.c b/usr/iscsi_net_util.c
+index 6339082..a32b49c 100644
+--- a/usr/iscsi_net_util.c
++++ b/usr/iscsi_net_util.c
+@@ -271,7 +271,8 @@ int net_setup_netdev(char *netdev, char *local_ip, char *mask, char *gateway,
+ 	if ((sock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+ 		log_error("Could not open socket to manage network "
+ 			  "(err %d - %s)", errno, strerror(errno));
+-		return errno;
++		ret = errno;
++		goto done;
+ 	}
+ 
+ 	/* Bring up NIC with correct address  - unless it
+@@ -389,7 +390,8 @@ int net_setup_netdev(char *netdev, char *local_ip, char *mask, char *gateway,
+ 	ret = 0;
+ 
+ done:
+-	close(sock);
++	if (sock >= 0)
++		close(sock);
+ 	if (vlan_id)
+ 		free(netdev);
+ 	return ret;
+-- 
+2.21.0

@@ -1,0 +1,60 @@
+From 9c5a21d14a2dff91b56574842218cc11e7457dfa Mon Sep 17 00:00:00 2001
+From: openEuler Buildteam <buildteam@openeuler.org>
+Date: Wed, 8 Jan 2020 04:13:29 -0500
+Subject: [PATCH] iscsi-initiator-utils: fix default file corrupt
+
+---
+ usr/idbm.c | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
+
+diff --git a/usr/idbm.c b/usr/idbm.c
+index 830189f..7ed0ce9 100644
+--- a/usr/idbm.c
++++ b/usr/idbm.c
+@@ -2006,6 +2006,7 @@ static int idbm_rec_write(node_rec_t *rec)
+ 	struct stat statb;
+ 	FILE *f;
+ 	char *portal;
++	char *portalDef = NULL;
+ 	int rc = 0;
+ 
+ 	portal = malloc(PATH_MAX);
+@@ -2092,7 +2093,7 @@ mkdir_portal:
+ 		}
+ 	}
+ 
+-	snprintf(portal, PATH_MAX, "%s/%s/%s,%d,%d/%s", NODE_CONFIG_DIR,
++	snprintf(portal, PATH_MAX, "%s/%s/%s,%d,%d/%s_bak", NODE_CONFIG_DIR,
+ 		 rec->name, rec->conn[0].address, rec->conn[0].port, rec->tpgt,
+ 		 rec->iface.name);
+ open_conf:
+@@ -2105,6 +2106,27 @@ open_conf:
+ 
+ 	idbm_print(IDBM_PRINT_TYPE_NODE, rec, 1, f);
+ 	fclose(f);
++
++	/* add for default_bak -> default */
++	portalDef = malloc(PATH_MAX);
++	if (!portalDef) {
++		log_error("Could not alloc default\n");
++		rc = ISCSI_ERR_IDBM;
++		goto free_portal;
++	}
++
++	snprintf(portalDef, PATH_MAX, "%s/%s/%s,%d,%d/%s", NODE_CONFIG_DIR,
++		 rec->name, rec->conn[0].address, rec->conn[0].port, rec->tpgt,
++		 rec->iface.name);
++	/* Renaming default_bak->default.  */
++	if (rename(portal, portalDef) < 0) {
++		log_error("Cannot rename %s -> %s\n",   portal, portalDef);
++		rc = ISCSI_ERR_IDBM;
++		goto free_portalDef;
++	}
++
++free_portalDef:
++	free(portalDef);
+ unlock:
+ 	idbm_unlock();
+ free_portal:
+-- 
+1.8.3.1

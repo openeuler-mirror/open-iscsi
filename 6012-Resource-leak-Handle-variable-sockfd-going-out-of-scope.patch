@@ -1,0 +1,29 @@
+From 98738bc389c62cef05bff9e03d5172253ebc82af Mon Sep 17 00:00:00 2001
+From: Chris Leech <cleech@redhat.com>
+Date: Wed, 30 Oct 2019 13:46:37 -0700
+Subject: [PATCH 29/43] Resource leak: Handle variable sockfd going out of
+ scope leaks the handle.
+
+---
+ usr/iscsi_net_util.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/usr/iscsi_net_util.c b/usr/iscsi_net_util.c
+index 56d2f69..b5a910f 100644
+--- a/usr/iscsi_net_util.c
++++ b/usr/iscsi_net_util.c
+@@ -196,8 +196,10 @@ static char *find_vlan_dev(char *netdev, int vlan_id) {
+ 	strlcpy(if_hwaddr.ifr_name, netdev, IFNAMSIZ);
+ 	ioctl(sockfd, SIOCGIFHWADDR, &if_hwaddr);
+ 
+-	if (if_hwaddr.ifr_hwaddr.sa_family != ARPHRD_ETHER)
++	if (if_hwaddr.ifr_hwaddr.sa_family != ARPHRD_ETHER) {
++		close(sockfd);
+ 		return NULL;
++	}
+ 
+ 	ifni = if_nameindex();
+ 	for (i = 0; ifni[i].if_index && ifni[i].if_name; i++) {
+-- 
+2.21.0
+
