@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.0.876
-Release: 13
+Release: 14
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -87,6 +87,8 @@ iscsid, and a management utility iscsiadm.
 Summary: Development files for %{name}
 Provides: libopeniscsiusr-devel
 Obsoletes: libopeniscsiusr-devel
+Provides: iscsi-initiator-utils-devel
+Obsoletes: iscsi-initiator-utils-devel
 Requires: %{name} = %{version}-%{release}
 
 %description devel
@@ -183,6 +185,12 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Sat Jan 11 2020 openEuler Buildteam <buildteam@openeuler.org> - 2.0.876-14
+- Type:enhancement
+- ID:NA
+- SUG:restart
+- DESC:provide iscsi-initiator-utils-devel
+
 * Wed Jan 9 2020 openEuler Buildteam <buildteam@openeuler.org> - 2.0.876-13
 - Type:enhancement
 - ID:NA
