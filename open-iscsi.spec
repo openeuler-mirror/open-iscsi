@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.0.876
-Release: 14
+Release: 15
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -142,7 +142,7 @@ install -pm 644 etc/systemd/*.socket $RPM_BUILD_ROOT%{_unitdir}
 
 %post
 /sbin/ldconfig
-%systemd_post iscsi.service iscsi-shutdown.service iscsid.service iscsiuio.service iscsid.socket iscsiuio.socket
+%systemd_post iscsi.service iscsid.service iscsiuio.service iscsid.socket iscsiuio.socket
 
 if [ $1 -eq 1 ]; then
     if [ ! -f %{_sysconfdir}/iscsi/initiatorname.iscsi ]; then
@@ -154,12 +154,11 @@ fi
 
 %preun
 %systemd_preun iscsi.service
-%systemd_preun iscsi-shutdown.service >/dev/null 2>&1
 %systemd_preun iscsid.service iscsiuio.service iscsid.socket iscsiuio.socket
 
 %postun
 /sbin/ldconfig
-%systemd_postun iscsi.service iscsi-shutdown.service iscsid.service iscsiuio.service iscsid.socket iscsiuio.socket
+%systemd_postun_with_restart iscsi.service iscsid.service iscsiuio.service iscsid.socket iscsiuio.socket
 
 %files
 %doc README COPYING
@@ -185,6 +184,12 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Fri Jan 17 2020 openEuler Buildteam <buildteam@openeuler.org> - 2.0.876-15
+- Type:bugfix
+- ID:NA
+- SUG:restart
+- DESC:fix install error
+
 * Sat Jan 11 2020 openEuler Buildteam <buildteam@openeuler.org> - 2.0.876-14
 - Type:enhancement
 - ID:NA
