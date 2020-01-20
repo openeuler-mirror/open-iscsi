@@ -1,44 +1,24 @@
-From 17764fc96f0ece0dca472d7f9b6105c62b4d7701 Mon Sep 17 00:00:00 2001
-From: openEuler Buildteam <buildteam@openeuler.org>
-Date: Wed, 8 Jan 2020 03:43:16 -0500
+From 1412b27dc88f5f2cdda5cb1cf0d2a9313313a390 Mon Sep 17 00:00:00 2001
+From: pengyeqing <pengyeqing@huawei.com>
+Date: Mon, 20 Jan 2020 19:43:52 +0800
 Subject: [PATCH] iscsi-initiator-utils: not send stop message if iscsid absent
 
+Signed-off-by: pengyeqing <pengyeqing@huawei.com>
 ---
- etc/systemd/iscsid.service   |  1 +
- etc/systemd/iscsiuio.service |  3 +-
- usr/iscsiadm.c               | 71 ++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 74 insertions(+), 1 deletion(-)
+ etc/systemd/iscsid.service |  2 ++
+ usr/iscsiadm.c             | 71 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 73 insertions(+)
 
 diff --git a/etc/systemd/iscsid.service b/etc/systemd/iscsid.service
-index 8df224e..fd85d52 100644
+index 2566b49..44a0363 100644
 --- a/etc/systemd/iscsid.service
 +++ b/etc/systemd/iscsid.service
-@@ -12,6 +12,7 @@ ExecStart=/sbin/iscsid -f
+@@ -9,6 +9,8 @@ PIDFile=/var/run/iscsid.pid
+ ExecStart=/usr/sbin/iscsid
  ExecStartPost=/usr/bin/sleep 1
- KillMode=mixed
- Restart=on-failure
+ ExecStop=/sbin/iscsiadm -k 0 2
++Restart=always
 +RestartSec=2s
- 
- [Install]
- WantedBy=multi-user.target
-diff --git a/etc/systemd/iscsiuio.service b/etc/systemd/iscsiuio.service
-index e4d9fd0..6bae65b 100644
---- a/etc/systemd/iscsiuio.service
-+++ b/etc/systemd/iscsiuio.service
-@@ -4,7 +4,7 @@ Documentation=man:iscsiuio(8)
- DefaultDependencies=no
- Conflicts=shutdown.target
- Requires=iscsid.service
--BindTo=iscsid.service
-+BindsTo=iscsid.service
- After=network.target
- Before=remote-fs-pre.target iscsid.service
- 
-@@ -14,6 +14,7 @@ NotifyAccess=main
- ExecStart=/sbin/iscsiuio -f
- KillMode=mixed
- Restart=on-failure
-+TimeoutStopSec=1
  
  [Install]
  WantedBy=multi-user.target

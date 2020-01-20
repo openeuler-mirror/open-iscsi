@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.0.876
-Release: 15
+Release: 16
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -34,7 +34,8 @@ Patch6020: 6020-Resource-leak-Variable-raw.patch
 Patch6021: 6021-Allow-reading-sysfs-port-to-fail-gracefully.patch
 Patch6022: 6022-Fix-incorrect-sysfs-logic-for-port-and-ip-address.patch
 Patch6023: 6023-Handle-ENOTCONN-error-separately-when-reading-sysfs.patch
-Patch6024: 6024-update-service-files.patch
+Patch6024: 6024-Added-service-file-for-iscsi-logins.patch
+Patch6025: 6025-Fixed-iscsi.service-considering-every-signal-and-exi.patch
 
 Patch9000: 9000-change-iscsi-iqn-default-value.patch
 Patch9001: 9001-iscsid-Check-nr_sessions-when-creating-a-copy-of-exi.patch
@@ -184,6 +185,12 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Mon Jan 20 2020 geruijun <geruijun@huawei.com> - 2.0.876-16
+- Type:bugfix
+- ID:NA
+- SUG:restart
+- DESC:fix service error
+
 * Fri Jan 17 2020 openEuler Buildteam <buildteam@openeuler.org> - 2.0.876-15
 - Type:bugfix
 - ID:NA
@@ -196,7 +203,7 @@ fi
 - SUG:restart
 - DESC:provide iscsi-initiator-utils-devel
 
-* Wed Jan 9 2020 openEuler Buildteam <buildteam@openeuler.org> - 2.0.876-13
+* Thu Jan 9 2020 openEuler Buildteam <buildteam@openeuler.org> - 2.0.876-13
 - Type:enhancement
 - ID:NA
 - SUG:restart
