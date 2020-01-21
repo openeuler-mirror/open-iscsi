@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.0.876
-Release: 16
+Release: 17
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -143,7 +143,7 @@ install -pm 644 etc/systemd/*.socket $RPM_BUILD_ROOT%{_unitdir}
 
 %post
 /sbin/ldconfig
-%systemd_post iscsi.service iscsid.service iscsiuio.service iscsid.socket iscsiuio.socket
+%systemd_post iscsi.service iscsid.service iscsid.socket
 
 if [ $1 -eq 1 ]; then
     if [ ! -f %{_sysconfdir}/iscsi/initiatorname.iscsi ]; then
@@ -155,11 +155,11 @@ fi
 
 %preun
 %systemd_preun iscsi.service
-%systemd_preun iscsid.service iscsiuio.service iscsid.socket iscsiuio.socket
+%systemd_preun iscsid.service iscsid.socket
 
 %postun
 /sbin/ldconfig
-%systemd_postun_with_restart iscsi.service iscsid.service iscsiuio.service iscsid.socket iscsiuio.socket
+%systemd_postun_with_restart iscsi.service iscsid.service iscsid.socket
 
 %files
 %doc README COPYING
@@ -185,6 +185,12 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Tue Jan 21 2020 geruijun <geruijun@huawei.com> - 2.0.876-17
+- Type:bugfix
+- ID:NA
+- SUG:restart
+- DESC:remove iscsiuio service
+
 * Mon Jan 20 2020 geruijun <geruijun@huawei.com> - 2.0.876-16
 - Type:bugfix
 - ID:NA
