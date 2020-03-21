@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.0.876
-Release: 17
+Release: 18
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -54,7 +54,7 @@ Patch9013: 9013-modify-utils-iscsi-iname.patch
 Patch9014: 9014-iscsi-iname-p-name-occur-buffer-overflow.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel
-BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config
+BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
 
 Provides:  iscsi-initiator-utils
 Obsoletes: iscsi-initiator-utils
@@ -62,7 +62,6 @@ Provides:  iscsi-initiator-utils-iscsiuio
 Obsoletes: iscsi-initiator-utils-iscsiuio
 Provides:  libbopeniscsiusr
 Obsoletes: libbopeniscsiusr
-Obsoletes: %{name}-devel < %{version}-%{release}
 %{?systemd_requires}
 
 %description
@@ -185,6 +184,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Sat Mar 21 2020 sunguoshuai <sunguoshuai@huawei.com> - 2.0.876-18
+- Fix upgrade problem and add gdb buildrequire.
+
 * Tue Jan 21 2020 geruijun <geruijun@huawei.com> - 2.0.876-17
 - Type:bugfix
 - ID:NA
