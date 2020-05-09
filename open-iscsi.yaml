@@ -1,0 +1,4 @@
+version-ctrl: github
+src_repo: open-iscsi/open-iscsi
+tag_prefix: ^v
+seperator: .
