@@ -4,54 +4,56 @@
 
 Name:    open-iscsi
 Version: 2.0.876
-Release: 18
+Release: 19
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
 Source0: https://github.com/open-iscsi/open-iscsi/archive/f3c8e90fc0894c088950a15ee6618b427f9e2457.tar.gz#/open-iscsi-f3c8e90.tar.gz
 
-Patch6000: 6000-Plugging-a-memory-leak-from-discovery.patch
-Patch6001: 6001-Fix-bug-in-error-message-when-reading-sysfs-numbers.patch
-Patch6002: 6002-Do-not-allow-multiple-sessions-when-nr_sessions-1.patch
-Patch6003: 6003-Fix-possible-discovery-hang-when-timing-out.patch
-Patch6004: 6004-Resource-leak-returning-without-freeing-netdev.patch
-Patch6005: 6005-Out-of-bounds-write-Overrunning-array-link_target.patch
-Patch6006: 6006-Resource-leak-Variable-rec-going-out-of-scope-leaks.patch
-Patch6007: 6007-Out-of-bounds-write-Overrunning-array-link_target.patch
-Patch6008: 6008-Buffer-not-null-terminated-Calling-strncpy.patch
-Patch6009: 6009-Resource-leak-Variable-startup_cmd-going-out-of-scop.patch
-Patch6010: 6010-Buffer-not-null-terminated-Calling-strncpy.patch
-Patch6011: 6011-Uninitialized-scalar-variable.patch
-Patch6012: 6012-Resource-leak-Handle-variable-sockfd-going-out-of-scope.patch
-Patch6013: 6013-Resource-leak-Variable-chap_info-going-out-of-scope.patch
-Patch6014: 6014-Resource-leak-Variable-matched_ses-going-out-of-scope.patch
-Patch6015: 6015-Resource-leak-Handle-variable-fd-going-out-of-scope.patch
-Patch6016: 6016-Resource-leak-Handle-variable-fd-going-out-of-scope.patch
-Patch6017: 6017-Out-of-bounds-read.patch
-Patch6018: 6018-fwparam_pcc-mulitple-resource-leaks.patch
-Patch6019: 6019-Resource-leak-Handl-variable-fd.patch
-Patch6020: 6020-Resource-leak-Variable-raw.patch
-Patch6021: 6021-Allow-reading-sysfs-port-to-fail-gracefully.patch
-Patch6022: 6022-Fix-incorrect-sysfs-logic-for-port-and-ip-address.patch
-Patch6023: 6023-Handle-ENOTCONN-error-separately-when-reading-sysfs.patch
-Patch6024: 6024-Added-service-file-for-iscsi-logins.patch
-Patch6025: 6025-Fixed-iscsi.service-considering-every-signal-and-exi.patch
+Patch0000: 0000-Plugging-a-memory-leak-from-discovery.patch
+Patch0001: 0001-Fix-bug-in-error-message-when-reading-sysfs-numbers.patch
+Patch0002: 0002-Do-not-allow-multiple-sessions-when-nr_sessions-1.patch
+Patch0003: 0003-Fix-possible-discovery-hang-when-timing-out.patch
+Patch0004: 0004-Resource-leak-returning-without-freeing-netdev.patch
+Patch0005: 0005-Out-of-bounds-write-Overrunning-array-link_target.patch
+Patch0006: 0006-Resource-leak-Variable-rec-going-out-of-scope-leaks.patch
+Patch0007: 0007-Out-of-bounds-write-Overrunning-array-link_target.patch
+Patch0008: 0008-Buffer-not-null-terminated-Calling-strncpy.patch
+Patch0009: 0009-Resource-leak-Variable-startup_cmd-going-out-of-scop.patch
+Patch0010: 0010-Buffer-not-null-terminated-Calling-strncpy.patch
+Patch0011: 0011-Uninitialized-scalar-variable.patch
+Patch0012: 0012-Resource-leak-Handle-variable-sockfd-going-out-of-scope.patch
+Patch0013: 0013-Resource-leak-Variable-chap_info-going-out-of-scope.patch
+Patch0014: 0014-Resource-leak-Variable-matched_ses-going-out-of-scope.patch
+Patch0015: 0015-Resource-leak-Handle-variable-fd-going-out-of-scope.patch
+Patch0016: 0016-Resource-leak-Handle-variable-fd-going-out-of-scope.patch
+Patch0017: 0017-Out-of-bounds-read.patch
+Patch0018: 0018-fwparam_pcc-mulitple-resource-leaks.patch
+Patch0019: 0019-Resource-leak-Handl-variable-fd.patch
+Patch0020: 0020-Resource-leak-Variable-raw.patch
+Patch0021: 0021-Allow-reading-sysfs-port-to-fail-gracefully.patch
+Patch0022: 0022-Fix-incorrect-sysfs-logic-for-port-and-ip-address.patch
+Patch0023: 0023-Handle-ENOTCONN-error-separately-when-reading-sysfs.patch
+Patch0024: 0024-Added-service-file-for-iscsi-logins.patch
+Patch0025: 0025-Fixed-iscsi.service-considering-every-signal-and-exi.patch
 
-Patch9000: 9000-change-iscsi-iqn-default-value.patch
-Patch9001: 9001-iscsid-Check-nr_sessions-when-creating-a-copy-of-exi.patch
-Patch9002: 9002-add-sleep-for-service.patch
-Patch9003: 9003-not-send-stop-message-if-iscsid-absent.patch
-Patch9004: 9004-iscsid-SIGTERM-syncprocess-hang.patch
-Patch9005: 9005-fix-timeout-setting-on-session-commands.patch
-Patch9006: 9006-restart-log-daemon-when-exited-abnormally.patch
-Patch9007: 9007-check-initiator-name-out-of-range.patch
-Patch9008: 9008-do-not-sync-session-when-a-session-is-already-created.patch
-Patch9009: 9009-fix-default-file-corrupt.patch
-Patch9010: 9010-iscsiadm-fix-infinite-loop-while-recv-returns-0.patch
-Patch9011: 9011-fix-iscsiadm-logout-timeout.patch
-Patch9012: 9012-default-file-zero-after-power-outage.patch
-Patch9013: 9013-modify-utils-iscsi-iname.patch
-Patch9014: 9014-iscsi-iname-p-name-occur-buffer-overflow.patch
+Patch0026: 0026-change-iscsi-iqn-default-value.patch
+Patch0027: 0027-iscsid-Check-nr_sessions-when-creating-a-copy-of-exi.patch
+Patch0028: 0028-add-sleep-for-service.patch
+Patch0029: 0029-not-send-stop-message-if-iscsid-absent.patch
+Patch0030: 0030-iscsid-SIGTERM-syncprocess-hang.patch
+Patch0031: 0031-fix-timeout-setting-on-session-commands.patch
+Patch0032: 0032-restart-log-daemon-when-exited-abnormally.patch
+Patch0033: 0033-check-initiator-name-out-of-range.patch
+Patch0034: 0034-do-not-sync-session-when-a-session-is-already-created.patch
+Patch0035: 0035-fix-default-file-corrupt.patch
+Patch0036: 0036-iscsiadm-fix-infinite-loop-while-recv-returns-0.patch
+Patch0037: 0037-fix-iscsiadm-logout-timeout.patch
+Patch0038: 0038-default-file-zero-after-power-outage.patch
+Patch0039: 0039-iscsi-iname-verify-prefix-length-is-at-most-210.patch 
+Patch0040: 0040-iscsi-iname-remove-unneeded-temp-buffer.patch   
+Patch0041: 0041-Fix-issue-where-iscsi-iname-p-core-dumps.patch 
+Patch0042: 0042-modify-iSCSI-shared-memory-permissions-for-logs.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
@@ -184,6 +186,12 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Tue May 12 2020 Wu Bo <wubo@huawei.com> - 2.0.876-19
+- iscsi-iname verfiy prefix length is at most 210 characters.
+  iscsi-iname remove unneeded temp buffer.
+  Fix issuse where 'iscsi-iname -p' core dumps.
+  modify iSCSI shared memory permissions for log.
+
 * Sat Mar 21 2020 sunguoshuai <sunguoshuai@huawei.com> - 2.0.876-18
 - Fix upgrade problem and add gdb buildrequire.
 
