@@ -1,0 +1,43 @@
+From 8576421467835d5c5ff5d48c3ff82ca797274236 Mon Sep 17 00:00:00 2001
+From: Chris Leech <cleech@redhat.com>
+Date: Tue, 12 May 2020 15:43:10 +0800
+Subject: [PATCH] iscsi-iname: verify prefix length is at most 210
+
+Don't know who might be trying to make reall long IQNs
+
+Signed-off-by: Chris Leech <cleech@redhat.com>
+---
+ utils/iscsi-iname.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/utils/iscsi-iname.c b/utils/iscsi-iname.c
+index 6273d83..da8e68a 100644
+--- a/utils/iscsi-iname.c
++++ b/utils/iscsi-iname.c
+@@ -35,7 +35,11 @@
+ #include "md5.h"
+ 
+ #define RANDOM_NUM_GENERATOR	"/dev/urandom"
+-
++/*
++ * iSCSI names have a maxinum length of 223 characters, we reserve 13 to append
++ * a seperator and 12 characters (6 random bytes in hex representation)
++ */
++#define PREFIX_MAX_LEN  210
+ int
+ main(int argc, char *argv[])
+ {
+@@ -67,6 +71,10 @@ main(int argc, char *argv[])
+ 			exit(0);
+ 		} else if ( strcmp(prefix, "-p") == 0 ) {
+ 			prefix = argv[2];
++			if (strnlen(prefix, PREFIX_MAX_LEN + 1) > PREFIX_MAX_LEN) {
++				printf("Error: Prexfix cannot exceed %d "
++					"characters.\n", PREFIX_MAX_LEN);
++			}
+ 		} else {
+ 			printf("\nUsage: iscsi-iname [-h | --help | "
+ 			       "-p <prefix>]\n");
+-- 
+1.8.3.1
+
