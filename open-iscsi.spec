@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.0.876
-Release: 19
+Release: 20
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -54,6 +54,8 @@ Patch0039: 0039-iscsi-iname-verify-prefix-length-is-at-most-210.patch
 Patch0040: 0040-iscsi-iname-remove-unneeded-temp-buffer.patch   
 Patch0041: 0041-Fix-issue-where-iscsi-iname-p-core-dumps.patch 
 Patch0042: 0042-modify-iSCSI-shared-memory-permissions-for-logs.patch
+Patch0043: 0043-iscsi-Add-break-to-while-loop.patch
+Patch0044: 0044-iscsi-fix-fd-leak.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
@@ -186,6 +188,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Mon Jun 15 2020 Zhiqiang Liu <liuzhiqiang26@huawei.com> - 2.0.876-20
+- Backport two upstream bugfix patches
+
 * Tue May 12 2020 Wu Bo <wubo@huawei.com> - 2.0.876-19
 - iscsi-iname verfiy prefix length is at most 210 characters.
   iscsi-iname remove unneeded temp buffer.
