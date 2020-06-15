@@ -1,0 +1,13 @@
+diff -Nur open-iscsi-f3c8e90fc0894c088950a15ee6618b427f9e2457-old/libopeniscsiusr/Makefile open-iscsi-f3c8e90fc0894c088950a15ee6618b427f9e2457/libopeniscsiusr/Makefile
+--- open-iscsi-f3c8e90fc0894c088950a15ee6618b427f9e2457-old/libopeniscsiusr/Makefile	2020-06-15 15:09:30.624567419 +0800
++++ open-iscsi-f3c8e90fc0894c088950a15ee6618b427f9e2457/libopeniscsiusr/Makefile	2020-06-15 15:11:09.378006613 +0800
+@@ -35,7 +35,8 @@
+ HEADERS = libopeniscsiusr/libopeniscsiusr.h \
+ 	  libopeniscsiusr/libopeniscsiusr_common.h \
+ 	  libopeniscsiusr/libopeniscsiusr_session.h \
+-	  libopeniscsiusr/libopeniscsiusr_iface.h
++	  libopeniscsiusr/libopeniscsiusr_iface.h \
++	  libopeniscsiusr/libopeniscsiusr_node.h
+ TESTS = tests/test_context tests/test_session tests/test_iface tests/test_node
+ EXTRA_MAN_FILES = libopeniscsiusr.h.3
+ 
