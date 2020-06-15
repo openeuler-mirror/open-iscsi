@@ -3,6 +3,8 @@ From: si-gui <245140120@qq.com>
 Date: Mon, 15 Jun 2020 17:07:36 +0800
 Subject: [PATCH] Fix devel without node header files
 
+Signed-off-by: si-gui 245140120@qq.com
+
 When user include libopeniscsiusr.h in the c files,we will get an error:
 "/usr/include/libopeniscsiusr.h:33:10: fatal error:
 libopeniscsiusr_node.h: No such file or directory"
