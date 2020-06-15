@@ -54,7 +54,7 @@ Patch0039: 0039-iscsi-iname-verify-prefix-length-is-at-most-210.patch
 Patch0040: 0040-iscsi-iname-remove-unneeded-temp-buffer.patch   
 Patch0041: 0041-Fix-issue-where-iscsi-iname-p-core-dumps.patch 
 Patch0042: 0042-modify-iSCSI-shared-memory-permissions-for-logs.patch
-Patch0043: fix-devel-without-node-header-files.patch
+Patch0043: 0043-Fix-devel-without-node-header-files.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
