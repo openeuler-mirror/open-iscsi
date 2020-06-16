@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.0.876
-Release: 20
+Release: 21
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
