@@ -1,0 +1,36 @@
+From f01725cfd9b2214f7c602bd72a5af9578dc9d023 Mon Sep 17 00:00:00 2001
+From: si-gui <245140120@qq.com>
+Date: Mon, 15 Jun 2020 17:07:36 +0800
+Subject: [PATCH] Fix devel without node header files
+
+When user include libopeniscsiusr.h in the c files,we will get an error:
+"/usr/include/libopeniscsiusr.h:33:10: fatal error:
+libopeniscsiusr_node.h: No such file or directory"
+
+We find libopeniscsiusr_node.h was forgetton in our
+libopeniscsiusr/Makefile, so fix it. Otherwise user can't use open-iscsi
+header file for development
+
+Signed-off-by: si-gui <245140120@qq.com>
+
+---
+ libopeniscsiusr/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libopeniscsiusr/Makefile b/libopeniscsiusr/Makefile
+index bf7c96c..75f6fb3 100644
+--- a/libopeniscsiusr/Makefile
++++ b/libopeniscsiusr/Makefile
+@@ -35,7 +35,8 @@ PKGFILE = libopeniscsiusr.pc
+ HEADERS = libopeniscsiusr/libopeniscsiusr.h \
+ 	  libopeniscsiusr/libopeniscsiusr_common.h \
+ 	  libopeniscsiusr/libopeniscsiusr_session.h \
+-	  libopeniscsiusr/libopeniscsiusr_iface.h
++	  libopeniscsiusr/libopeniscsiusr_iface.h \
++	  libopeniscsiusr/libopeniscsiusr_node.h
+ TESTS = tests/test_context tests/test_session tests/test_iface tests/test_node
+ EXTRA_MAN_FILES = libopeniscsiusr.h.3
+ 
+-- 
+2.23.0
+
