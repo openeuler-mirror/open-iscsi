@@ -1,0 +1,35 @@
+From 05766f1e85ea7fbf975559d27814c769328c72dd Mon Sep 17 00:00:00 2001
+From: liubo <liubo254@huawei.com>
+Date: Thu, 4 Jun 2020 16:57:07 +0800
+Subject: [PATCH] iscsi: Add break to while loop
+
+Fix the potential risk of rc value being washed out by jumping out of the loop
+
+Source Link: https://github.com/open-iscsi/open-iscsi/pull/211
+
+Signed-off-by: liubo <liubo254@huawei.com>
+Reported-by: Zhiqiang Liu <liuzhiqiang26@huawei.com>
+---
+ utils/fwparam_ibft/fwparam_sysfs.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/utils/fwparam_ibft/fwparam_sysfs.c b/utils/fwparam_ibft/fwparam_sysfs.c
+index a0cd1c7..87fd6d4 100644
+--- a/utils/fwparam_ibft/fwparam_sysfs.c
++++ b/utils/fwparam_ibft/fwparam_sysfs.c
+@@ -115,8 +115,11 @@ static int get_iface_from_device(char *id, struct boot_context *context)
+ 				break;
+ 			}
+ 
+-			if (sscanf(dent->d_name, "net:%s", context->iface) != 1)
++			if (sscanf(dent->d_name, "net:%s", context->iface) != 1) {
+ 				rc = EINVAL;
++				break;
++			}
++
+ 			rc = 0;
+ 			break;
+ 		} else {
+-- 
+2.21.1 (Apple Git-122.3)
+
