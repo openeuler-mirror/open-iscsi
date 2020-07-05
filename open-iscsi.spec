@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.0.876
-Release: 21
+Release: 22
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -189,6 +189,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Sun Jul 5 2020 Zhiqiang Liu <lzhq28@mail.ustc.edu.cn> - 2.0.876-22
+- remove useless readme files.
+
 * Mon Jun 15 2020 sunguoshuai <sunguoshuai@huawei.com> - 2.0.876-21
 - fix devel without node header files
 
