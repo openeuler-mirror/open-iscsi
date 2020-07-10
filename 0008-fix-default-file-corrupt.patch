@@ -1,17 +1,17 @@
-From 9c5a21d14a2dff91b56574842218cc11e7457dfa Mon Sep 17 00:00:00 2001
+From 64fe2b6749cb3d53444d9a5663d8e6c852d5aa17 Mon Sep 17 00:00:00 2001
 From: openEuler Buildteam <buildteam@openeuler.org>
 Date: Wed, 8 Jan 2020 04:13:29 -0500
 Subject: [PATCH] iscsi-initiator-utils: fix default file corrupt
 
 ---
- usr/idbm.c | 24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
+ usr/idbm.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
 
 diff --git a/usr/idbm.c b/usr/idbm.c
-index 830189f..7ed0ce9 100644
+index 6309be0..be5f8f9 100644
 --- a/usr/idbm.c
 +++ b/usr/idbm.c
-@@ -2006,6 +2006,7 @@ static int idbm_rec_write(node_rec_t *rec)
+@@ -2139,6 +2139,7 @@ static int idbm_rec_write(node_rec_t *rec, bool disable_lock)
  	struct stat statb;
  	FILE *f;
  	char *portal;
@@ -19,7 +19,7 @@ index 830189f..7ed0ce9 100644
  	int rc = 0;
  
  	portal = malloc(PATH_MAX);
-@@ -2092,7 +2093,7 @@ mkdir_portal:
+@@ -2227,7 +2228,7 @@ mkdir_portal:
  		}
  	}
  
@@ -28,7 +28,7 @@ index 830189f..7ed0ce9 100644
  		 rec->name, rec->conn[0].address, rec->conn[0].port, rec->tpgt,
  		 rec->iface.name);
  open_conf:
-@@ -2105,6 +2106,27 @@ open_conf:
+@@ -2240,6 +2241,28 @@ open_conf:
  
  	idbm_print(IDBM_PRINT_TYPE_NODE, rec, 1, f);
  	fclose(f);
@@ -53,8 +53,10 @@ index 830189f..7ed0ce9 100644
 +
 +free_portalDef:
 +	free(portalDef);
++ 
  unlock:
- 	idbm_unlock();
- free_portal:
+ 	if (!disable_lock)
+ 		idbm_unlock();
 -- 
 1.8.3.1
+

@@ -1,4 +1,4 @@
-From 10886ac1cf645b7eefb113a03eb31ef7a49f5910 Mon Sep 17 00:00:00 2001
+From 5a5e63101a9428567767efb50fe5cd60f8f39cea Mon Sep 17 00:00:00 2001
 From: wangjufeng <wangjufeng@huawei.com>
 Date: Sat, 20 Oct 2018 14:50:28 +0800
 Subject: [PATCH] tt
@@ -6,15 +6,15 @@ Subject: [PATCH] tt
 ---
  usr/event_poll.c |  17 +++++++-
  usr/iscsid.c     |   2 +-
- usr/log.c        | 120 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ usr/log.c        | 124 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
  usr/log.h        |   6 +++
- 4 files changed, 140 insertions(+), 5 deletions(-)
+ 4 files changed, 144 insertions(+), 5 deletions(-)
 
 diff --git a/usr/event_poll.c b/usr/event_poll.c
-index ac25044..a3a3676 100644
+index 4cf4ce2..7b70cb7 100644
 --- a/usr/event_poll.c
 +++ b/usr/event_poll.c
-@@ -134,8 +134,11 @@ void event_loop_exit(queue_task_t *qtask)
+@@ -151,8 +151,11 @@ void event_loop_exit(queue_task_t *qtask)
  
  void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd)
  {
@@ -27,7 +27,7 @@ index ac25044..a3a3676 100644
  	sigset_t sigset;
  	int sig_fd;
  
-@@ -157,6 +160,13 @@ void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd)
+@@ -174,6 +177,13 @@ void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd)
  	poll_array[POLL_ALARM].fd = sig_fd;
  	poll_array[POLL_ALARM].events = POLLIN;
  
@@ -41,7 +41,7 @@ index ac25044..a3a3676 100644
  	event_loop_stop = 0;
  	while (1) {
  		if (event_loop_stop) {
-@@ -171,7 +181,7 @@ void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd)
+@@ -188,7 +198,7 @@ void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd)
  		/* Runs actors and may set alarm for future actors */
  		actor_poll();
  
@@ -50,7 +50,7 @@ index ac25044..a3a3676 100644
  
  		if (res > 0) {
  			log_debug(6, "poll result %d", res);
-@@ -181,6 +191,9 @@ void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd)
+@@ -198,6 +208,9 @@ void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd)
  			if (poll_array[POLL_IPC].revents)
  				mgmt_ipc_handle(mgmt_ipc_fd);
  
@@ -61,10 +61,10 @@ index ac25044..a3a3676 100644
  				struct signalfd_siginfo si;
  
 diff --git a/usr/iscsid.c b/usr/iscsid.c
-index 8202bc9..6329644 100644
+index c9ab9eb..56689e5 100644
 --- a/usr/iscsid.c
 +++ b/usr/iscsid.c
-@@ -59,7 +59,6 @@ struct iscsi_daemon_config daemon_config;
+@@ -62,7 +62,6 @@ struct iscsi_daemon_config daemon_config;
  struct iscsi_daemon_config *dconfig = &daemon_config;
  
  static char program_name[] = "iscsid";
@@ -72,7 +72,7 @@ index 8202bc9..6329644 100644
  static gid_t gid;
  static int daemonize = 1;
  static int mgmt_ipc_fd;
-@@ -302,6 +301,7 @@ static void iscsid_shutdown(void)
+@@ -307,6 +306,7 @@ static void iscsid_shutdown(void)
  		log_debug(1, "daemon stopping");
  		log_close(log_pid);
  	}
@@ -81,7 +81,7 @@ index 8202bc9..6329644 100644
  
  static void catch_signal(int signo)
 diff --git a/usr/log.c b/usr/log.c
-index b730642..35d5564 100644
+index 6e16e7c..c225bdc 100644
 --- a/usr/log.c
 +++ b/usr/log.c
 @@ -18,6 +18,7 @@
@@ -92,21 +92,21 @@ index b730642..35d5564 100644
  
  #include "iscsi_util.h"
  #include "log.h"
-@@ -33,6 +34,13 @@
- 
- char *log_name;
+@@ -35,6 +36,13 @@ char *log_name;
  int log_level = 0;
+ struct logarea *la = NULL;
+ 
 +pid_t log_pid = -1;
-+
 +static int default_watchdog_timeout = 4;
 +static char program_name[] = "iscsid";
 +static int watchdog_timerfd = -1;
 +static int last_watchdog_count = 0;
 +static int watchdog_noupdate_count = 0;
- 
++
  static int log_stop_daemon = 0;
  static void (*log_func)(int prio, void *priv, const char *fmt, va_list ap);
-@@ -141,6 +149,7 @@ static int logarea_init (int size)
+ static void *log_func_priv;
+@@ -142,6 +150,7 @@ static int logarea_init (int size)
  	la->shmid_buff = shmid;
  	la->ops[0].sem_num = 0;
  	la->ops[0].sem_flg = 0;
@@ -114,7 +114,7 @@ index b730642..35d5564 100644
  
  	return 0;
  
-@@ -414,6 +423,105 @@ static void __log_close(void)
+@@ -421,6 +430,105 @@ static void __log_close(void)
  	}
  }
  
@@ -220,7 +220,7 @@ index b730642..35d5564 100644
  int log_init(char *program_name, int size,
  	void (*func)(int prio, void *priv, const char *fmt, va_list ap),
  	void *priv)
-@@ -436,6 +540,8 @@ int log_init(char *program_name, int size,
+@@ -443,6 +551,8 @@ int log_init(char *program_name, int size,
  			return -1;
  		}
  
@@ -229,7 +229,7 @@ index b730642..35d5564 100644
  		pid = fork();
  		if (pid < 0) {
  			syslog(LOG_ERR, "starting logger failed");
-@@ -456,6 +562,8 @@ int log_init(char *program_name, int size,
+@@ -463,6 +573,8 @@ int log_init(char *program_name, int size,
  		sigaction(SIGTERM, &sa_new, &sa_old );
  
  		while(1) {
@@ -238,7 +238,7 @@ index b730642..35d5564 100644
  			log_flush();
  			sleep(1);
  
-@@ -480,7 +588,15 @@ void log_close(pid_t pid)
+@@ -487,7 +599,15 @@ void log_close(pid_t pid)
  	}
  
  	if (pid > 0) {
@@ -257,7 +257,7 @@ index b730642..35d5564 100644
  	}
  }
 diff --git a/usr/log.h b/usr/log.h
-index 486a08e..d4f8b80 100644
+index c548791..6affd3b 100644
 --- a/usr/log.h
 +++ b/usr/log.h
 @@ -28,6 +28,7 @@
@@ -283,10 +283,10 @@ index 486a08e..d4f8b80 100644
 +	uint64_t watchdog_count;
  };
  
- struct logarea *la;
+ extern struct logarea *la;
  
 +extern int log_get_timerfd(void);
-+extern void log_close_watchdog_timer(void);
++extern void log_close_watchdog_time(void);
 +extern void log_watchdog_handle(void);
  extern int log_init(char *program_name, int size,
  	void (*func)(int prio, void *priv, const char *fmt, va_list ap),

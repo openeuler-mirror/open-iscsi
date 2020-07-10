@@ -3,62 +3,33 @@
 %global socket_enable()    /bin/systemctl enable %1.socket >/dev/null 2>&1 || :
 
 Name:    open-iscsi
-Version: 2.0.876
-Release: 22
+Version: 2.1.1
+Release: 1
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
-Source0: https://github.com/open-iscsi/open-iscsi/archive/f3c8e90fc0894c088950a15ee6618b427f9e2457.tar.gz#/open-iscsi-f3c8e90.tar.gz
+Source0: https://github.com/open-iscsi/open-iscsi/archive/2.1.1.tar.gz#/open-iscsi-2.1.1.tar.gz
+Patch0000: 0000-change-iscsi-iqn-default-value.patch 
+Patch0001: 0001-iscsid-Check-nr_sessions-when-creating-a-copy-of-exi.patch
+Patch0002: 0002-add-sleep-for-service.patch 
+Patch0003: 0003-not-send-stop-message-if-iscsid-absent.patch
+Patch0004: 0004-iscsid-SIGTERM-syncprocess-hang.patch
+Patch0005: 0005-restart-log-daemon-when-exited-abnormally.patch
+Patch0006: 0006-check-initiator-name-out-of-range.patch
+Patch0007: 0007-do-not-sync-session-when-a-session-is-already-created.patch
+Patch0008: 0008-fix-default-file-corrupt.patch
+Patch0009: 0009-iscsiadm-fix-infinite-loop-while-recv-returns-0.patch
+Patch0010: 0010-fix-iscsiadm-logout-timeout.patch
+Patch0011: 0011-default-file-zero-after-power-outage.patch
+Patch0012: 0012-Fix-issue-where-iscsi-iname-p-core-dumps.patch 
+Patch0013: 0013-modify-iSCSI-shared-memory-permissions-for-logs.patch
+Patch0014: 0014-iscsi-Add-break-to-while-loop.patch
+Patch0015: 0015-iscsi-fix-fd-leak.patch
+Patch0016: 0016-Fix-devel-without-node-header-files.patch
+Patch0017: 0017-resolve-compilation-errors.patch
 
-Patch0000: 0000-Plugging-a-memory-leak-from-discovery.patch
-Patch0001: 0001-Fix-bug-in-error-message-when-reading-sysfs-numbers.patch
-Patch0002: 0002-Do-not-allow-multiple-sessions-when-nr_sessions-1.patch
-Patch0003: 0003-Fix-possible-discovery-hang-when-timing-out.patch
-Patch0004: 0004-Resource-leak-returning-without-freeing-netdev.patch
-Patch0005: 0005-Out-of-bounds-write-Overrunning-array-link_target.patch
-Patch0006: 0006-Resource-leak-Variable-rec-going-out-of-scope-leaks.patch
-Patch0007: 0007-Out-of-bounds-write-Overrunning-array-link_target.patch
-Patch0008: 0008-Buffer-not-null-terminated-Calling-strncpy.patch
-Patch0009: 0009-Resource-leak-Variable-startup_cmd-going-out-of-scop.patch
-Patch0010: 0010-Buffer-not-null-terminated-Calling-strncpy.patch
-Patch0011: 0011-Uninitialized-scalar-variable.patch
-Patch0012: 0012-Resource-leak-Handle-variable-sockfd-going-out-of-scope.patch
-Patch0013: 0013-Resource-leak-Variable-chap_info-going-out-of-scope.patch
-Patch0014: 0014-Resource-leak-Variable-matched_ses-going-out-of-scope.patch
-Patch0015: 0015-Resource-leak-Handle-variable-fd-going-out-of-scope.patch
-Patch0016: 0016-Resource-leak-Handle-variable-fd-going-out-of-scope.patch
-Patch0017: 0017-Out-of-bounds-read.patch
-Patch0018: 0018-fwparam_pcc-mulitple-resource-leaks.patch
-Patch0019: 0019-Resource-leak-Handl-variable-fd.patch
-Patch0020: 0020-Resource-leak-Variable-raw.patch
-Patch0021: 0021-Allow-reading-sysfs-port-to-fail-gracefully.patch
-Patch0022: 0022-Fix-incorrect-sysfs-logic-for-port-and-ip-address.patch
-Patch0023: 0023-Handle-ENOTCONN-error-separately-when-reading-sysfs.patch
-Patch0024: 0024-Added-service-file-for-iscsi-logins.patch
-Patch0025: 0025-Fixed-iscsi.service-considering-every-signal-and-exi.patch
 
-Patch0026: 0026-change-iscsi-iqn-default-value.patch
-Patch0027: 0027-iscsid-Check-nr_sessions-when-creating-a-copy-of-exi.patch
-Patch0028: 0028-add-sleep-for-service.patch
-Patch0029: 0029-not-send-stop-message-if-iscsid-absent.patch
-Patch0030: 0030-iscsid-SIGTERM-syncprocess-hang.patch
-Patch0031: 0031-fix-timeout-setting-on-session-commands.patch
-Patch0032: 0032-restart-log-daemon-when-exited-abnormally.patch
-Patch0033: 0033-check-initiator-name-out-of-range.patch
-Patch0034: 0034-do-not-sync-session-when-a-session-is-already-created.patch
-Patch0035: 0035-fix-default-file-corrupt.patch
-Patch0036: 0036-iscsiadm-fix-infinite-loop-while-recv-returns-0.patch
-Patch0037: 0037-fix-iscsiadm-logout-timeout.patch
-Patch0038: 0038-default-file-zero-after-power-outage.patch
-Patch0039: 0039-iscsi-iname-verify-prefix-length-is-at-most-210.patch 
-Patch0040: 0040-iscsi-iname-remove-unneeded-temp-buffer.patch   
-Patch0041: 0041-Fix-issue-where-iscsi-iname-p-core-dumps.patch 
-Patch0042: 0042-modify-iSCSI-shared-memory-permissions-for-logs.patch
-Patch0043: 0043-iscsi-Add-break-to-while-loop.patch
-Patch0044: 0044-iscsi-fix-fd-leak.patch
-Patch0045: 0045-Fix-devel-without-node-header-files.patch
-
-BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel
+BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
 
 Provides:  iscsi-initiator-utils
@@ -107,7 +78,7 @@ Requires: man
 This contains man files for the using of %{name}.
 
 %prep
-%autosetup -n open-iscsi-f3c8e90fc0894c088950a15ee6618b427f9e2457 -p1
+%autosetup -n open-iscsi-2.1.1 -p1
 perl -i -pe 's|^exec_prefix = /$|exec_prefix = %{_exec_prefix}|' Makefile
 
 %build
@@ -189,8 +160,11 @@ fi
 %{_mandir}/man8/*
 
 %changelog
-* Sun Jul 5 2020 Zhiqiang Liu <lzhq28@mail.ustc.edu.cn> - 2.0.876-22
-- remove useless readme files.
+* Thu Jul 9 2020 wuguanghao <wuguanghao3@huawei.com> - 2.1.1-1
+- Type:enhancement
+- ID:NA
+- SUG:NA
+- DESC:update open-iscsi version to 2.1.1-1
 
 * Mon Jun 15 2020 sunguoshuai <sunguoshuai@huawei.com> - 2.0.876-21
 - fix devel without node header files
