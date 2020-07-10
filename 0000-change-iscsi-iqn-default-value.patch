@@ -1,4 +1,4 @@
-From 2fb5d2dbcfdc052881749e22268c06b1402257a7 Mon Sep 17 00:00:00 2001
+From 50b9f68b960360eab065b63d6660b1f70f227c13 Mon Sep 17 00:00:00 2001
 From: pengyeqing <pengyeqing@huawei.com>
 Date: Sat, 26 Jan 2019 22:09:24 +0800
 Subject: [PATCH] iscsi-initiator-utils: change iscsi iqn default value
@@ -7,35 +7,38 @@ reason:change iscsi iqn default value
 
 Signed-off-by: pengyeqing <pengyeqing@huawei.com>
 ---
- doc/iscsi-iname.8   | 2 +-
+ doc/iscsi-iname.8   | 4 ++--
  utils/iscsi-iname.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/doc/iscsi-iname.8 b/doc/iscsi-iname.8
-index a55d666d1af3..dd77ed9f3165 100644
+index 6a413f6..34c47b4 100644
 --- a/doc/iscsi-iname.8
 +++ b/doc/iscsi-iname.8
-@@ -14,7 +14,7 @@ generates a unique iSCSI node name on every invocation.
+@@ -14,8 +14,8 @@ generates a unique iSCSI node name on every invocation.
  Display help
  .TP
  .BI [-p=]\fIprefix\fP
--Use the prefix passed in instead of the default "iqn.2005-03.org.open-iscsi"
+-Use the prefix passed in instead of the default "iqn.2016-04.com.open-iscsi"
+-
 +Use the prefix passed in instead of the default "iqn.2012-01.com.openeuler"
- 
++ 
  .SH AUTHORS
  Open-iSCSI project <http://www.open-iscsi.com/>
+ .br
 diff --git a/utils/iscsi-iname.c b/utils/iscsi-iname.c
-index cb2f6c8..926bf3a 100644
+index da850dc..08161f4 100644
 --- a/utils/iscsi-iname.c
 +++ b/utils/iscsi-iname.c
-@@ -73,7 +73,7 @@ main(int argc, char *argv[])
+@@ -80,7 +80,7 @@ main(int argc, char *argv[])
  			exit(0);
  		}
  	} else {
--		prefix = "iqn.2005-03.org.open-iscsi";
+-		prefix = "iqn.2016-04.com.open-iscsi";
 +		prefix = "iqn.2012-01.com.openeuler";
  	}
  
  	/* try to feed some entropy from the pool to MD5 in order to get
 -- 
 1.8.3.1
+
