@@ -161,10 +161,7 @@ fi
 
 %changelog
 * Thu Jul 9 2020 wuguanghao <wuguanghao3@huawei.com> - 2.1.1-1
-- Type:enhancement
-- ID:NA
-- SUG:NA
-- DESC:update open-iscsi version to 2.1.1-1
+- update open-iscsi version to 2.1.1-1
 
 * Sun Jul 5 2020 Zhiqiang Liu <lzhq28@mail.ustc.edu.cn> - 2.0.876-22
 - remove useless readme files
