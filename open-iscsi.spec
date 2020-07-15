@@ -9,24 +9,24 @@ Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
 Source0: https://github.com/open-iscsi/open-iscsi/archive/2.1.1.tar.gz#/open-iscsi-2.1.1.tar.gz
-Patch0000: 0000-change-iscsi-iqn-default-value.patch 
-Patch0001: 0001-iscsid-Check-nr_sessions-when-creating-a-copy-of-exi.patch
-Patch0002: 0002-add-sleep-for-service.patch 
-Patch0003: 0003-not-send-stop-message-if-iscsid-absent.patch
-Patch0004: 0004-iscsid-SIGTERM-syncprocess-hang.patch
-Patch0005: 0005-restart-log-daemon-when-exited-abnormally.patch
-Patch0006: 0006-check-initiator-name-out-of-range.patch
-Patch0007: 0007-do-not-sync-session-when-a-session-is-already-created.patch
-Patch0008: 0008-fix-default-file-corrupt.patch
-Patch0009: 0009-iscsiadm-fix-infinite-loop-while-recv-returns-0.patch
-Patch0010: 0010-fix-iscsiadm-logout-timeout.patch
-Patch0011: 0011-default-file-zero-after-power-outage.patch
-Patch0012: 0012-Fix-issue-where-iscsi-iname-p-core-dumps.patch 
-Patch0013: 0013-modify-iSCSI-shared-memory-permissions-for-logs.patch
-Patch0014: 0014-iscsi-Add-break-to-while-loop.patch
-Patch0015: 0015-iscsi-fix-fd-leak.patch
-Patch0016: 0016-Fix-devel-without-node-header-files.patch
-Patch0017: 0017-resolve-compilation-errors.patch
+Patch1: 0001-change-iscsi-iqn-default-value.patch 
+Patch2: 0002-iscsid-Check-nr_sessions-when-creating-a-copy-of-exi.patch
+Patch3: 0003-add-sleep-for-service.patch 
+Patch4: 0004-not-send-stop-message-if-iscsid-absent.patch
+Patch5: 0005-iscsid-SIGTERM-syncprocess-hang.patch
+Patch6: 0006-restart-log-daemon-when-exited-abnormally.patch
+Patch7: 0007-check-initiator-name-out-of-range.patch
+Patch8: 0008-do-not-sync-session-when-a-session-is-already-created.patch
+Patch9: 0009-fix-default-file-corrupt.patch
+Patch10: 0010-iscsiadm-fix-infinite-loop-while-recv-returns-0.patch
+Patch11: 0011-fix-iscsiadm-logout-timeout.patch
+Patch12: 0012-default-file-zero-after-power-outage.patch
+Patch13: 0013-Fix-issue-where-iscsi-iname-p-core-dumps.patch 
+Patch14: 0014-modify-iSCSI-shared-memory-permissions-for-logs.patch
+Patch15: 0015-iscsi-Add-break-to-while-loop.patch
+Patch16: 0016-iscsi-fix-fd-leak.patch
+Patch17: 0017-Fix-devel-without-node-header-files.patch
+Patch18: 0018-resolve-compilation-errors.patch
 
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
@@ -165,6 +165,9 @@ fi
 - ID:NA
 - SUG:NA
 - DESC:update open-iscsi version to 2.1.1-1
+
+* Sun Jul 5 2020 Zhiqiang Liu <lzhq28@mail.ustc.edu.cn> - 2.0.876-22
+- remove useless readme files
 
 * Mon Jun 15 2020 sunguoshuai <sunguoshuai@huawei.com> - 2.0.876-21
 - fix devel without node header files
