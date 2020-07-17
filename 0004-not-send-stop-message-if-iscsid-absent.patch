@@ -1,4 +1,4 @@
-From 1412b27dc88f5f2cdda5cb1cf0d2a9313313a390 Mon Sep 17 00:00:00 2001
+From d99f5bb9a8fcd217262d765b096df30724c774e9 Mon Sep 17 00:00:00 2001
 From: pengyeqing <pengyeqing@huawei.com>
 Date: Mon, 20 Jan 2020 19:43:52 +0800
 Subject: [PATCH] iscsi-initiator-utils: not send stop message if iscsid absent
@@ -10,12 +10,12 @@ Signed-off-by: pengyeqing <pengyeqing@huawei.com>
  2 files changed, 73 insertions(+)
 
 diff --git a/etc/systemd/iscsid.service b/etc/systemd/iscsid.service
-index 2566b49..44a0363 100644
+index f3f8c65..2cce190 100644
 --- a/etc/systemd/iscsid.service
 +++ b/etc/systemd/iscsid.service
 @@ -9,6 +9,8 @@ PIDFile=/var/run/iscsid.pid
- ExecStart=/usr/sbin/iscsid
- ExecStartPost=/usr/bin/sleep 1
+ ExecStart=/sbin/iscsid
+ ExecStopPost=/usr/bin/sleep 1
  ExecStop=/sbin/iscsiadm -k 0 2
 +Restart=always
 +RestartSec=2s
@@ -23,7 +23,7 @@ index 2566b49..44a0363 100644
  [Install]
  WantedBy=multi-user.target
 diff --git a/usr/iscsiadm.c b/usr/iscsiadm.c
-index 4796c2f..8b5d5fe 100644
+index f2bd721..b386abe 100644
 --- a/usr/iscsiadm.c
 +++ b/usr/iscsiadm.c
 @@ -69,6 +69,8 @@ static char program_name[] = "iscsiadm";
