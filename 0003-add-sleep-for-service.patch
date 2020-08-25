@@ -1,0 +1,44 @@
+From 83126f4ab8c67704d779d9d15b2e1227d11209ff Mon Sep 17 00:00:00 2001
+From: pengyeqing <pengyeqing@huawei.com>
+Date: Sat, 26 Jan 2019 22:44:59 +0800
+Subject: [PATCH] iscsi-initiator-utils: add sleep for service
+
+add sleep for service
+
+Signed-off-by: pengyeqing <pengyeqing@huawei.com>
+Signed-off-by: wuguanghao <wuguanghao3@huawei.com>
+---
+ etc/systemd/iscsid.service | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/etc/systemd/iscsid.service b/etc/systemd/iscsid.service
+index 4fef168..f3f8c65 100644
+--- a/etc/systemd/iscsid.service
++++ b/etc/systemd/iscsid.service
+@@ -1,17 +1,14 @@
+ [Unit]
+ Description=Open-iSCSI
+ Documentation=man:iscsid(8) man:iscsiuio(8) man:iscsiadm(8)
+-DefaultDependencies=no
+-After=network.target iscsiuio.service
+-Before=remote-fs-pre.target
++After=network.target NetworkManager-wait-online.service iscsiuio.service tgtd.service targetcli.service
+ 
+ [Service]
+-Type=notify
+-NotifyAccess=main
+-ExecStart=/sbin/iscsid -f
+-KillMode=mixed
+-Restart=on-failure
++Type=forking
++PIDFile=/var/run/iscsid.pid
++ExecStart=/sbin/iscsid
++ExecStopPost=/usr/bin/sleep 1
++ExecStop=/sbin/iscsiadm -k 0 2
+ 
+ [Install]
+ WantedBy=multi-user.target
+-Also=iscsid.socket
+-- 
+1.8.3.1
+

@@ -1,0 +1,296 @@
+From 88767cf8e6c62df3260e895664bfe7094e55d565 Mon Sep 17 00:00:00 2001
+From: wangjufeng <wangjufeng@huawei.com>
+Date: Sat, 20 Oct 2018 14:50:28 +0800
+Subject: [PATCH] tt
+
+---
+ usr/event_poll.c |  17 +++++++-
+ usr/iscsid.c     |   2 +-
+ usr/log.c        | 124 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ usr/log.h        |   6 +++
+ 4 files changed, 144 insertions(+), 5 deletions(-)
+
+diff --git a/usr/event_poll.c b/usr/event_poll.c
+index 4cf4ce2..7b70cb7 100644
+--- a/usr/event_poll.c
++++ b/usr/event_poll.c
+@@ -151,8 +151,11 @@ void event_loop_exit(queue_task_t *qtask)
+ 
+ void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd)
+ {
+-	struct pollfd poll_array[POLL_MAX];
++	struct pollfd poll_array[POLL_MAX + 1];
+ 	int res, has_shutdown_children = 0;
++	int log_timerfd = log_get_timerfd();
++	int pool_count = POLL_MAX;
++	int poll_timerfd_index = -1;
+ 	sigset_t sigset;
+ 	int sig_fd;
+ 
+@@ -174,6 +177,13 @@ void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd)
+ 	poll_array[POLL_ALARM].fd = sig_fd;
+ 	poll_array[POLL_ALARM].events = POLLIN;
+ 
++	if (log_timerfd >= 0) {
++		poll_array[POLL_MAX].fd = log_timerfd;
++		poll_array[POLL_MAX].events = POLLIN;
++		poll_timerfd_index = POLL_MAX;
++		pool_count += 1;
++	}
++
+ 	event_loop_stop = 0;
+ 	while (1) {
+ 		if (event_loop_stop) {
+@@ -188,7 +198,7 @@ void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd)
+ 		/* Runs actors and may set alarm for future actors */
+ 		actor_poll();
+ 
+-		res = poll(poll_array, POLL_MAX, reap_count ? REAP_WAKEUP : -1);
++		res = poll(poll_array, pool_count, reap_count ? REAP_WAKEUP : -1);
+ 
+ 		if (res > 0) {
+ 			log_debug(6, "poll result %d", res);
+@@ -198,6 +208,9 @@ void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd)
+ 			if (poll_array[POLL_IPC].revents)
+ 				mgmt_ipc_handle(mgmt_ipc_fd);
+ 
++			if(log_timerfd >= 0 && poll_array[poll_timerfd_index].revents)
++				log_watchdog_handle();
++
+ 			if (poll_array[POLL_ALARM].revents) {
+ 				struct signalfd_siginfo si;
+ 
+diff --git a/usr/iscsid.c b/usr/iscsid.c
+index c9ab9eb..56689e5 100644
+--- a/usr/iscsid.c
++++ b/usr/iscsid.c
+@@ -62,7 +62,6 @@ struct iscsi_daemon_config daemon_config;
+ struct iscsi_daemon_config *dconfig = &daemon_config;
+ 
+ static char program_name[] = "iscsid";
+-static pid_t log_pid;
+ static gid_t gid;
+ static int daemonize = 1;
+ static int mgmt_ipc_fd;
+@@ -307,6 +306,7 @@ static void iscsid_shutdown(void)
+ 		log_debug(1, "daemon stopping");
+ 		log_close(log_pid);
+ 	}
++	log_close_watchdog_timer();
+ }
+ 
+ static void catch_signal(int signo)
+diff --git a/usr/log.c b/usr/log.c
+index 6e16e7c..c225bdc 100644
+--- a/usr/log.c
++++ b/usr/log.c
+@@ -18,6 +18,7 @@
+ #include <sys/types.h>
+ #include <sys/types.h>
+ #include <sys/wait.h>
++#include <sys/timerfd.h>
+ 
+ #include "iscsi_util.h"
+ #include "log.h"
+@@ -35,6 +36,13 @@ char *log_name;
+ int log_level = 0;
+ struct logarea *la = NULL;
+ 
++pid_t log_pid = -1;
++static int default_watchdog_timeout = 4;
++static char program_name[] = "iscsid";
++static int watchdog_timerfd = -1;
++static int last_watchdog_count = 0;
++static int watchdog_noupdate_count = 0;
++
+ static int log_stop_daemon = 0;
+ static void (*log_func)(int prio, void *priv, const char *fmt, va_list ap);
+ static void *log_func_priv;
+@@ -142,6 +150,7 @@ static int logarea_init (int size)
+ 	la->shmid_buff = shmid;
+ 	la->ops[0].sem_num = 0;
+ 	la->ops[0].sem_flg = 0;
++	la->watchdog_count = 0;
+ 
+ 	return 0;
+ 
+@@ -421,6 +430,105 @@ static void __log_close(void)
+ 	}
+ }
+ 
++static int log_restart_daemon(void)
++{
++	log_close(log_pid);
++	log_pid = log_init(program_name, DEFAULT_AREA_SIZE, log_do_log_daemon, NULL);
++	if (log_pid < 0)
++		return -1;
++	return 0;
++}
++
++static int log_watchdog_setup(void)
++{
++	int r;
++	struct itimerspec new_value;
++	uint32_t period_inus = 1 * 1000000; /*1 second*/
++	uint32_t seconds;
++	uint32_t nanoseconds;
++	if (log_stop_daemon || watchdog_timerfd >= 0)
++		return 0;
++
++	watchdog_timerfd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
++	if (watchdog_timerfd < 0) {
++		syslog(LOG_ERR, "Create watchdog timer failed. errno: %d", errno);
++		return -1;
++	}
++	seconds = period_inus / 1000000;
++	nanoseconds = (period_inus - (seconds * 1000000)) * 1000;
++	new_value.it_interval.tv_sec = seconds;
++	new_value.it_interval.tv_nsec = nanoseconds;
++	new_value.it_value.tv_sec = seconds;
++	new_value.it_value.tv_nsec = nanoseconds;
++
++	r = timerfd_settime(watchdog_timerfd, 0, &new_value, NULL);
++	if (r < 0) {
++		syslog(LOG_ERR, "Set watchdog timer failed. errno: %d", errno);
++		log_close_watchdog_timer();
++		return -1;
++	}
++	return 0;
++}
++
++static int log_read_comm_frpm_pid(pid_t pid, char *buffer, int len)
++{
++	char comm_file[256];
++	char comm_content[1024];
++	int r;
++	FILE *fd = NULL;
++	buffer[0] = '\0';
++	snprintf(comm_file, sizeof(comm_file), "/proc/%i/comm", pid);
++	fd = fopen(comm_file, "r");
++	if (!fd)
++		return -1;
++	if (!fgets(buffer, len, fd)) {
++		log_warning("Can not read file. File:%s.", comm_file);
++               fclose(fd);
++               fd = NULL;
++		return -1;
++	}
++       fclose(fd);
++       fd = NULL;
++	return 0;
++}
++
++int log_get_timerfd(void)
++{
++	return watchdog_timerfd;
++}
++
++void log_close_watchdog_timer(void)
++{
++	if(watchdog_timerfd >= 0) {
++		close(watchdog_timerfd);
++		watchdog_timerfd = -1;
++	}
++}
++
++void log_watchdog_handle(void)
++{
++	uint64_t expir = 0;
++	int len;
++	int new_watchdog_count;
++	len = read(watchdog_timerfd, &expir, sizeof(uint64_t));
++	if(len > 0 && expir > 0) {
++		if (la && !log_stop_daemon) {
++			new_watchdog_count = la->watchdog_count;
++			if (new_watchdog_count == last_watchdog_count) {
++				watchdog_noupdate_count++;
++				if (watchdog_noupdate_count >= default_watchdog_timeout) {
++					watchdog_noupdate_count = 0;
++					syslog(LOG_ERR, "log daemon is not alive, try to restart.");
++					log_restart_daemon();
++				}
++			} else {
++				watchdog_noupdate_count = 0;
++				last_watchdog_count = new_watchdog_count;
++			}
++		}
++	}
++}
++
+ int log_init(char *program_name, int size,
+ 	void (*func)(int prio, void *priv, const char *fmt, va_list ap),
+ 	void *priv)
+@@ -443,6 +551,8 @@ int log_init(char *program_name, int size,
+ 			return -1;
+ 		}
+ 
++		log_watchdog_setup();
++
+ 		pid = fork();
+ 		if (pid < 0) {
+ 			syslog(LOG_ERR, "starting logger failed");
+@@ -463,6 +573,8 @@ int log_init(char *program_name, int size,
+ 		sigaction(SIGTERM, &sa_new, &sa_old );
+ 
+ 		while(1) {
++			if (la)
++				la->watchdog_count++;
+ 			log_flush();
+ 			sleep(1);
+ 
+@@ -487,7 +599,15 @@ void log_close(pid_t pid)
+ 	}
+ 
+ 	if (pid > 0) {
+-		kill(pid, SIGTERM);
+-		waitpid(pid, &status, 0);
++		char comm[1024];
++		int r;
++		r = log_read_comm_frpm_pid(pid, comm, sizeof(comm));
++		if (!r && strstr(comm, "iscsid")) {
++			syslog(LOG_WARNING, "Send SIGTERM to iSCSI logger, pid=%i.", pid);
++			kill(pid, SIGTERM);
++			waitpid(pid, &status, 0);
++		} else {
++			syslog(LOG_WARNING, "iSCSI logger with pid=%i already exited.", pid);
++		}
+ 	}
+ }
+diff --git a/usr/log.h b/usr/log.h
+index c548791..f0c88c7 100644
+--- a/usr/log.h
++++ b/usr/log.h
+@@ -28,6 +28,7 @@
+ 
+ #include <stdarg.h>
+ #include <sys/types.h>
++#include <stdint.h>
+ #include "iscsid.h"
+ 
+ union semun {
+@@ -42,6 +43,7 @@ union semun {
+ #define MAX_MSG_SIZE 256
+ 
+ extern int log_level;
++extern pid_t log_pid;
+ 
+ struct logmsg {
+ 	short int prio;
+@@ -62,10 +64,14 @@ struct logarea {
+ 	struct sembuf ops[1];
+ 	int semid;
+ 	union semun semarg;
++	uint64_t watchdog_count;
+ };
+ 
+ extern struct logarea *la;
+ 
++extern int log_get_timerfd(void);
++extern void log_close_watchdog_timer(void);
++extern void log_watchdog_handle(void);
+ extern int log_init(char *program_name, int size,
+ 	void (*func)(int prio, void *priv, const char *fmt, va_list ap),
+ 	void *priv);
+-- 
+1.8.3.1
+
