@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.1
-Release: 1
+Release: 2
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -27,7 +27,7 @@ Patch15: 0015-iscsi-Add-break-to-while-loop.patch
 Patch16: 0016-iscsi-fix-fd-leak.patch
 Patch17: 0017-Fix-devel-without-node-header-files.patch
 Patch18: 0018-resolve-compilation-errors.patch
-
+Patch19: 0019-Update-systemd-unit-files-for-iscsid.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
@@ -160,6 +160,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Tue Sep 1 2020 wuguanghao <wuguanghao3@huawei.com> - 2.1.1-2
+- backport one patch for solving install problem
+
 * Thu Jul 9 2020 wuguanghao <wuguanghao3@huawei.com> - 2.1.1-1
 - update open-iscsi version to 2.1.1-1
 
