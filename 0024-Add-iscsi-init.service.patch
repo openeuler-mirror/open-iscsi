@@ -1,0 +1,52 @@
+From f37d5b653f9f251845db3f29b1a3dcb90ec89731 Mon Sep 17 00:00:00 2001
+From: Christian Glombek <cglombek@redhat.com>
+Date: Wed, 6 May 2020 02:08:59 +0200
+Subject: [PATCH 163/170] Add iscsi-init.service
+
+Per Fedora Packaging Guidelines [1], initial configuration of a service
+should happen in a one-off init service in order to ensure idempotency,
+and not in the %post directive of the RPM spec.
+
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1493296
+
+[1]: https://docs.fedoraproject.org/en-US/packaging-guidelines/Initial_Service_Setup/
+---
+ etc/systemd/iscsi-init.service | 8 ++++++++
+ etc/systemd/iscsi.service      | 6 +++---
+ 2 files changed, 11 insertions(+), 3 deletions(-)
+ create mode 100644 etc/systemd/iscsi-init.service
+
+diff --git a/etc/systemd/iscsi-init.service b/etc/systemd/iscsi-init.service
+new file mode 100644
+index 0000000..e058ff0
+--- /dev/null
++++ b/etc/systemd/iscsi-init.service
+@@ -0,0 +1,8 @@
++[Unit]
++Description=One time configuration for iscsi.service
++ConditionPathExists=!/etc/iscsi/initiatorname.iscsi
++
++[Service]
++Type=oneshot
++RemainAfterExit=no
++ExecStart=/usr/bin/sh -c 'echo "InitiatorName=`/usr/sbin/iscsi-iname`" > /etc/iscsi/initiatorname.iscsi'
+diff --git a/etc/systemd/iscsi.service b/etc/systemd/iscsi.service
+index 1c286d1..2f2bf81 100644
+--- a/etc/systemd/iscsi.service
++++ b/etc/systemd/iscsi.service
+@@ -2,9 +2,9 @@
+ Description=Login and scanning of iSCSI devices
+ Documentation=man:iscsiadm(8) man:iscsid(8)
+ Before=remote-fs.target
+-After=network.target network-online.target iscsid.service
+-Requires=iscsid.socket
+-ConditionPathExists=/etc/iscsi/initiatorname.iscsi
++After=network.target network-online.target
++After=iscsid.service iscsi-init.service
++Requires=iscsid.socket iscsi-init.service
+ 
+ [Service]
+ Type=oneshot
+-- 
+2.21.1 (Apple Git-122.3)
+
