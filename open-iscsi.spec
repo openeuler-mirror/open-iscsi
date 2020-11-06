@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.1
-Release: 1
+Release: 2
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -31,6 +31,7 @@ Patch18: 0018-resolve-compilation-errors.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
+Requires:  open-iscsi-help
 
 Provides:  iscsi-initiator-utils
 Obsoletes: iscsi-initiator-utils
@@ -160,6 +161,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Fri Nov 6 2020 jialei <jialei17@huawei.com> - 2.1.1-2
+- add help for Requires
+
 * Thu Jul 9 2020 wuguanghao <wuguanghao3@huawei.com> - 2.1.1-1
 - update open-iscsi version to 2.1.1-1
 
