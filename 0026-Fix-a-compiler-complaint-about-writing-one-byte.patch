@@ -1,0 +1,30 @@
+From 10009f1c5fc01238be976867bc02be046325850b Mon Sep 17 00:00:00 2001
+From: Lee Duncan <lduncan@suse.com>
+Date: Wed, 3 Jun 2020 08:36:45 -0700
+Subject: [PATCH 165/170] Fix a compiler complaint about writing one byte
+
+When playing with IPv6 IP addresses, which are described
+in C using a union, and the gcc-10 compiler didn't like
+that we were not specifying which member of the union
+we wanted to address of, when in fact all members have
+the same address. The fix is to be more explicit.
+---
+ iscsiuio/src/uip/ipv6.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/iscsiuio/src/uip/ipv6.c b/iscsiuio/src/uip/ipv6.c
+index 05efa73..11cb4e9 100644
+--- a/iscsiuio/src/uip/ipv6.c
++++ b/iscsiuio/src/uip/ipv6.c
+@@ -519,7 +519,7 @@ static void ipv6_insert_protocol_chksum(struct ipv6_hdr *ipv6)
+ 	 * SRC IP, DST IP, Protocol Data Length, and Next Header.
+ 	 */
+ 	sum = 0;
+-	ptr = (u16_t *)&ipv6->ipv6_src;
++	ptr = (u16_t *)&ipv6->ipv6_src.addr16[0];
+ 
+ 	for (i = 0; i < sizeof(struct ipv6_addr); i++) {
+ 		sum += HOST_TO_NET16(*ptr);
+-- 
+2.21.1 (Apple Git-122.3)
+

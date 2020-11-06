@@ -1,0 +1,66 @@
+From 8d96cc47381a840e5e03384e8077ad238fd1adc4 Mon Sep 17 00:00:00 2001
+From: Lee Duncan <lduncan@suse.com>
+Date: Wed, 3 Jun 2020 08:29:39 -0700
+Subject: [PATCH 164/170] Fix issue with zero-length arrays at end of struct
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+A common practice in C coding, over the years, has been to
+add a zero-length array at the end of the structure when trying
+to represent a possibly-empty array of bytes that may be
+appended to the struct. But the gcc-10 compiler does not
+like such structures, taking the zero-length literally.
+
+The following errors are fixed by this commit:
+
+> iscsiadm.c: In function ‘session_stats’:
+> iscsiadm.c:939:56: error: array subscript ‘(<unknown>) + -1’ is outside the bounds of an interior zero-length array ‘struct iscsi_stats_custom[0]’ [-Werror=zero-length-bounds]
+>   939 |         (unsigned long long)rsp.u.getstats.stats.custom[i].value);
+>       |                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+> In file included from initiator.h:29,
+>                  from iscsiadm.c:36:
+> ../include/iscsi_if.h:844:28: note: while referencing ‘custom’
+>   844 |  struct iscsi_stats_custom custom[0]
+>       |                            ^~~~~~
+> iscsiadm.c:938:56: error: array subscript ‘(<unknown>) + -1’ is outside the bounds of an interior zero-length array ‘struct iscsi_stats_custom[0]’ [-Werror=zero-length-bounds]
+>   938 |   printf("\t%s: %llu\n", rsp.u.getstats.stats.custom[i].desc,
+>       |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+> In file included from initiator.h:29,
+>                  from iscsiadm.c:36:
+> ../include/iscsi_if.h:844:28: note: while referencing ‘custom’
+>   844 |  struct iscsi_stats_custom custom[0]
+>       |                            ^~~~~~
+> cc1: all warnings being treated as errors
+
+The work around is to convert the two "custom[0]" structure members to
+use "custom[]".
+---
+ include/iscsi_if.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/iscsi_if.h b/include/iscsi_if.h
+index 2d46214..5a1c614 100644
+--- a/include/iscsi_if.h
++++ b/include/iscsi_if.h
+@@ -841,7 +841,7 @@ struct iscsi_stats {
+ 	 * up to ISCSI_STATS_CUSTOM_MAX
+ 	 */
+ 	uint32_t custom_length;
+-	struct iscsi_stats_custom custom[0]
++	struct iscsi_stats_custom custom[]
+ 		__attribute__ ((aligned (sizeof(uint64_t))));
+ };
+ 
+@@ -972,7 +972,7 @@ struct iscsi_offload_host_stats {
+ 	 * up to ISCSI_HOST_STATS_CUSTOM_MAX
+ 	 */
+ 	uint32_t custom_length;
+-	struct iscsi_host_stats_custom custom[0]
++	struct iscsi_host_stats_custom custom[]
+ 		 __attribute__ ((aligned (sizeof(uint64_t))));
+ };
+ 
+-- 
+2.21.1 (Apple Git-122.3)
+

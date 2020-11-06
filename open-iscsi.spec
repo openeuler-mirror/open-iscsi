@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.1
-Release: 2
+Release: 3
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -28,6 +28,13 @@ Patch16: 0016-iscsi-fix-fd-leak.patch
 Patch17: 0017-Fix-devel-without-node-header-files.patch
 Patch18: 0018-resolve-compilation-errors.patch
 Patch19: 0019-Update-systemd-unit-files-for-iscsid.patch
+Patch20: 0020-Fix-iscsi.service-so-it-handles-restarts-better.patch
+Patch21: 0021-Ignore-iface.example-in-iface-match-checks.patch
+Patch22: 0022-Fix-SIGPIPE-loop-in-signal-handler.patch
+Patch23: 0023-Proper-disconnect-of-TCP-connection.patch
+Patch24: 0024-Add-iscsi-init.service.patch
+Patch25: 0025-Fix-issue-with-zero-length-arrays-at-end-of-struct.patch
+Patch26: 0026-Fix-a-compiler-complaint-about-writing-one-byte.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
@@ -160,6 +167,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Sat Oct 31 2020 haowenchao <haowenchao@huawei.com> - 2.1.1-3
+- backport patches from epoch1
+
 * Tue Sep 1 2020 wuguanghao <wuguanghao3@huawei.com> - 2.1.1-2
 - backport one patch for solving install problem
 
