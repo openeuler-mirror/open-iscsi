@@ -1,0 +1,90 @@
+From 802688debcd88c48edabe86deb7e7ed47ebadc26 Mon Sep 17 00:00:00 2001
+From: Lee Duncan <lduncan@suse.com>
+Date: Fri, 24 Jul 2020 17:39:50 -0700
+Subject: [PATCH 3/8] Preparing for version 2.1.2
+
+---
+ Changelog                 | 43 +++++++++++++++++++++++++++++++++++++++++++
+ libopeniscsiusr/version.h |  2 +-
+ usr/version.h             |  2 +-
+ 3 files changed, 45 insertions(+), 2 deletions(-)
+
+diff --git a/Changelog b/Changelog
+index 9af7bf1..29133ee 100644
+--- a/Changelog
++++ b/Changelog
+@@ -1,3 +1,46 @@
++open-iscsi-2.1.0 - open-iscsi-2.1.2
++
++Christian Glombek (1):
++      Add iscsi-init.service
++
++David Disseldorp (2):
++      use openssl for random data generation
++      drop unused get_random_bytes()
++
++Lee Duncan (10):
++      Fix iscsi.service so it handles restarts better
++      Fix issue where "iscsi-iname -p" core dumps.
++      Add Wants=remote-fs-pre.target for sequencing.
++      Change include of <sys/poll.h> to <poll.h>
++      Fix type mismatch under musl.
++      More changes for musl.
++      Ignore iface.example in iface match checks
++      Fix issue with zero-length arrays at end of struct
++      Fix a compiler complaint about writing one byte
++      Fix compiler complaint about string copy in iscsiuio
++
++Luis.wu (1):
++      Update iscsi-iname.c
++
++Rafael David Tinoco (1):
++      Misspelled socket name might cause confusion to inexperienced user.
++
++Wu Bo (2):
++      iscsi-iname: fix iscsi-iname -p access NULL pointer without given IQN prefix
++      log:modify iSCSI shared memory permissions for logs
++
++fredvx (1):
++      Fix SIGPIPE loop in signal handler
++
++gulams (1):
++      Proper disconnect of TCP connection
++
++wubo009 (3):
++      iscsi: Add break to while loop
++      iscsi: fix fd leak
++      iscsi/libopeniscsiusr:add libopeniscsiuser_node.h to HEADERS
++
++
+ open-iscsi-2.1.0 - open-iscsi-2.1.1
+ 
+ # output from "git shortlog --no-merges 2.1.0..HEAD"
+diff --git a/libopeniscsiusr/version.h b/libopeniscsiusr/version.h
+index 9be3905..97031b0 100644
+--- a/libopeniscsiusr/version.h
++++ b/libopeniscsiusr/version.h
+@@ -25,6 +25,6 @@
+  * This may not be the same value as the kernel versions because
+  * some other maintainer could merge a patch without going through us
+  */
+-#define ISCSI_VERSION_STR	"2.1.1"
++#define ISCSI_VERSION_STR	"2.1.2"
+ 
+ #endif  /* End of __ISCSI_OPEN_USR_VERSION_H__ */
+diff --git a/usr/version.h b/usr/version.h
+index 4fa9179..115a11c 100644
+--- a/usr/version.h
++++ b/usr/version.h
+@@ -6,7 +6,7 @@
+  * This may not be the same value as the kernel versions because
+  * some other maintainer could merge a patch without going through us
+  */
+-#define ISCSI_VERSION_STR	"2.1.1"
++#define ISCSI_VERSION_STR	"2.1.2"
+ #define ISCSI_VERSION_FILE	"/sys/module/scsi_transport_iscsi/version"
+ 
+ #endif
+-- 
+1.8.3.1
+
