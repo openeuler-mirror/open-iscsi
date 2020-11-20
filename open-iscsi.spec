@@ -35,11 +35,8 @@ Patch23: 0023-Proper-disconnect-of-TCP-connection.patch
 Patch24: 0024-Add-iscsi-init.service.patch
 Patch25: 0025-Fix-issue-with-zero-length-arrays-at-end-of-struct.patch
 Patch26: 0026-Fix-a-compiler-complaint-about-writing-one-byte.patch
-Patch27: 0027-use-openssl-for-random-data-generation.patch
-Patch28: 0028-drop-unused-get_random_bytes.patch
-Patch29: 0029-Preparing-for-version-2.1.2.patch
-Patch30: 0030-iscsid-Check-Invalid-Session-id-for-stop-connection.patch
-Patch31: 0031-iscsiadm-buffer-overflow-regression-when-discovering.patch
+Patch27: 0027-iscsid-Check-Invalid-Session-id-for-stop-connection.patch
+Patch28: 0028-iscsiadm-buffer-overflow-regression-when-discovering.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
