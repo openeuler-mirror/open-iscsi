@@ -1,0 +1,64 @@
+From 9ac758cc472d991d7eaa9a1da17279cbbdbc7ebf Mon Sep 17 00:00:00 2001
+From: gulams <64251312+gulams@users.noreply.github.com>
+Date: Thu, 3 Sep 2020 21:28:52 +0530
+Subject: [PATCH 5/8] iscsid: Check Invalid Session id for stop connection
+
+Description:
+If the initiator is rebooting then after the reboot, it will try to
+resync (recreate) the existing the connections by reading the sysfs.
+While initiator is doing this, i.e when the initiator tries to connect
+to the target but if the target service is not yet started, then the
+initiator connection will fail. The session id is also not yet assigned
+and it will be at its initial value 0xFFFFFFFF which is invalid. The
+session id is assigned a valid value only after a successful connection.
+Since the connection is failed, the initiator code will queue the
+connection for re-open. The connection state is still at
+ISCSI_CONN_STATE_XPT_WAIT as its very first login attemp after the
+reboot.
+Due to my Pull #206 request the code will invoke the stop connection to
+decrement the socket_fd reference count to properly close the connecion
+(details are in pull request #206). But since the session id is not
+valid, the stop connection will fail and the code will go ahead and
+queue the re-open without attempting the connect again. This is repeated
+till 120 seconds (stop connection failing and requeuing the reopen
+without invoking connect) and the connection will be shutdown resulting
+the storage unavailable.
+
+Fix:
+We need to check the validity of the session id before calling the stop
+connection. If the session id is valid then only invoke the stop
+connection. Due to this, the code will go ahead and attempt the connet
+call. If the target service comes up anytime in 120 seconds, then the
+connect will be successful and we will get connected to the target.
+---
+ usr/initiator.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/usr/initiator.c b/usr/initiator.c
+index 5f4bdca..684647c 100644
+--- a/usr/initiator.c
++++ b/usr/initiator.c
+@@ -692,6 +692,7 @@ static void iscsi_login_eh(struct iscsi_conn *conn, struct queue_task *qtask,
+ 			   int err)
+ {
+ 	struct iscsi_session *session = conn->session;
++	int stop_flag = 0;
+ 
+ 	log_debug(3, "iscsi_login_eh");
+ 	/*
+@@ -711,7 +712,11 @@ static void iscsi_login_eh(struct iscsi_conn *conn, struct queue_task *qtask,
+ 			    !iscsi_retry_initial_login(conn))
+ 				session_conn_shutdown(conn, qtask, err);
+ 			else {
+-				session_conn_reopen(conn, qtask, STOP_CONN_TERM);
++				stop_flag = (session->id < INVALID_SESSION_ID) ? STOP_CONN_TERM : 0;
++				log_debug(6, "connection %p socket_fd: %d, "
++					  "session id: %d stop_flag: %d\n",
++					  conn, conn->socket_fd, session->id, stop_flag);
++				session_conn_reopen(conn, qtask, stop_flag);
+ 			}
+ 			break;
+ 		case R_STAGE_SESSION_REDIRECT:
+-- 
+1.8.3.1
+
