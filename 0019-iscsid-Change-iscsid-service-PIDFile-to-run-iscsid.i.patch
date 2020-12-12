@@ -1,0 +1,29 @@
+From dafbd11b65b2bbceed1e9b72d6213ddea73a0a34 Mon Sep 17 00:00:00 2001
+From: Wenchao Hao <haowenchao@huawei.com>
+Date: Sat, 12 Dec 2020 17:09:34 +0800
+Subject: [PATCH] iscsid: Change iscsid service PIDFile to /run/iscsid.ipd
+
+The pid file has be changed from /var/run/iscsid.pid to
+/run/iscsid.pid in code, here perform a sync.
+
+Signed-off-by: Wenchao Hao <haowenchao@huawei.com>
+---
+ etc/systemd/iscsid.service | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/etc/systemd/iscsid.service b/etc/systemd/iscsid.service
+index 828877f..be3ae9e 100644
+--- a/etc/systemd/iscsid.service
++++ b/etc/systemd/iscsid.service
+@@ -6,7 +6,7 @@ DefaultDependencies=no
+ 
+ [Service]
+ Type=forking
+-PIDFile=/var/run/iscsid.pid
++PIDFile=/run/iscsid.pid
+ ExecStart=/sbin/iscsid
+ ExecStopPost=/usr/bin/sleep 1
+ ExecStop=/sbin/iscsiadm -k 0 2
+-- 
+2.29.2.435.g72ffeb997e
+
