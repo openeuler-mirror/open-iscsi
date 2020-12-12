@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.1
-Release: 4
+Release: 5
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -37,6 +37,7 @@ Patch25: 0025-Fix-issue-with-zero-length-arrays-at-end-of-struct.patch
 Patch26: 0026-Fix-a-compiler-complaint-about-writing-one-byte.patch
 Patch27: 0027-iscsid-Check-Invalid-Session-id-for-stop-connection.patch
 Patch28: 0028-iscsiadm-buffer-overflow-regression-when-discovering.patch
+Patch29: 0029-iscsid-Change-iscsid-service-PIDFile-to-run-iscsid.i.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
@@ -169,6 +170,11 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Sat Dec 12 2020 haowenchao <haowenchao@huawei.com> - 2.1.1-5
+- Change iscsid service PIDFile to /run/iscsid.ipd
+  The pid file has be changed from /var/run/iscsid.pid to
+  /run/iscsid.pid in code, here perform a sync.
+
 * Thu Nov 12 2020 haowenchao <haowenchao@huawei.com> - 2.1.1-4
 - backport patches from epoch2 including following changes:
   get_random_bytes is replaced by RAND_bytes so it is removed
