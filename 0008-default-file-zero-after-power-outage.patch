@@ -1,0 +1,50 @@
+From 9bfec2b1c66ffe05c04ece6eded412cc2fd49f84 Mon Sep 17 00:00:00 2001
+From: sangxu <sangxu@huawei.com>
+Date: Wed, 30 May 2018 15:54:53 +0800
+Subject: [PATCH] fix default file zero after power outage, fsync file
+ immediately and use correct parameters info when removing old file.
+
+---
+ usr/idbm.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/usr/idbm.c b/usr/idbm.c
+index be5f8f9..d431b00 100644
+--- a/usr/idbm.c
++++ b/usr/idbm.c
+@@ -2240,6 +2240,23 @@ open_conf:
+ 	}
+ 
+ 	idbm_print(IDBM_PRINT_TYPE_NODE, rec, 1, f);
++
++	rc = fflush(f);
++	if (rc){
++		log_error("Could not fflush %s: %s\n", portal, strerror(errno));
++		rc = ISCSI_ERR_IDBM;
++		fclose(f);
++		goto free_portal;
++
++	}
++
++	if (fsync(fileno(f)) < 0){
++		log_error("Could not fsync %s: %s\n", portal, strerror(errno));
++		rc = ISCSI_ERR_IDBM;
++		fclose(f);
++		goto free_portal;
++	 }
++
+ 	fclose(f);
+ 
+ 	/* add for default_bak -> default */
+@@ -2455,7 +2472,7 @@ int idbm_add_node(node_rec_t *newrec, discovery_rec_t *drec, int overwrite)
+ 			goto unlock;
+ 		}
+ 
+-		rc = idbm_delete_node(&rec);
++		rc = idbm_delete_node(newrec);
+ 		if (rc)
+ 			goto unlock;
+ 		log_debug(7, "overwriting existing record");
+-- 
+1.8.3.1
+

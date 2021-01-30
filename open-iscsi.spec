@@ -3,41 +3,23 @@
 %global socket_enable()    /bin/systemctl enable %1.socket >/dev/null 2>&1 || :
 
 Name:    open-iscsi
-Version: 2.1.1
-Release: 5
+Version: 2.1.3
+Release: 1
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
-Source0: https://github.com/open-iscsi/open-iscsi/archive/2.1.1.tar.gz#/open-iscsi-2.1.1.tar.gz
-Patch1: 0001-change-iscsi-iqn-default-value.patch 
-Patch2: 0002-iscsid-Check-nr_sessions-when-creating-a-copy-of-exi.patch
-Patch3: 0003-add-sleep-for-service.patch 
-Patch4: 0004-not-send-stop-message-if-iscsid-absent.patch
-Patch5: 0005-iscsid-SIGTERM-syncprocess-hang.patch
-Patch6: 0006-restart-log-daemon-when-exited-abnormally.patch
-Patch7: 0007-check-initiator-name-out-of-range.patch
-Patch8: 0008-do-not-sync-session-when-a-session-is-already-created.patch
-Patch9: 0009-fix-default-file-corrupt.patch
-Patch10: 0010-iscsiadm-fix-infinite-loop-while-recv-returns-0.patch
-Patch11: 0011-fix-iscsiadm-logout-timeout.patch
-Patch12: 0012-default-file-zero-after-power-outage.patch
-Patch13: 0013-Fix-issue-where-iscsi-iname-p-core-dumps.patch 
-Patch14: 0014-modify-iSCSI-shared-memory-permissions-for-logs.patch
-Patch15: 0015-iscsi-Add-break-to-while-loop.patch
-Patch16: 0016-iscsi-fix-fd-leak.patch
-Patch17: 0017-Fix-devel-without-node-header-files.patch
-Patch18: 0018-resolve-compilation-errors.patch
-Patch19: 0019-Update-systemd-unit-files-for-iscsid.patch
-Patch20: 0020-Fix-iscsi.service-so-it-handles-restarts-better.patch
-Patch21: 0021-Ignore-iface.example-in-iface-match-checks.patch
-Patch22: 0022-Fix-SIGPIPE-loop-in-signal-handler.patch
-Patch23: 0023-Proper-disconnect-of-TCP-connection.patch
-Patch24: 0024-Add-iscsi-init.service.patch
-Patch25: 0025-Fix-issue-with-zero-length-arrays-at-end-of-struct.patch
-Patch26: 0026-Fix-a-compiler-complaint-about-writing-one-byte.patch
-Patch27: 0027-iscsid-Check-Invalid-Session-id-for-stop-connection.patch
-Patch28: 0028-iscsiadm-buffer-overflow-regression-when-discovering.patch
-Patch29: 0029-iscsid-Change-iscsid-service-PIDFile-to-run-iscsid.i.patch
+Source0: https://github.com/open-iscsi/open-iscsi/archive/2.1.3.tar.gz#/open-iscsi-2.1.3.tar.gz
+patch1: 0001-change-iscsi-iqn-default-value.patch
+patch2: 0002-iscsid-Check-nr_sessions-when-creating-a-copy-of-exi.patch
+patch3: 0003-restart-log-daemon-when-exited-abnormally.patch
+patch4: 0004-check-initiator-name-out-of-range.patch
+patch5: 0005-do-not-sync-session-when-a-session-is-already-created.patch
+patch6: 0006-fix-default-file-corrupt.patch
+patch7: 0007-fix-iscsiadm-logout-timeout.patch
+patch8: 0008-default-file-zero-after-power-outage.patch
+patch9: 0009-Modify-iscsid.service-to-keep-same-with-previous-ver.patch
+patch10: 0010-iscsiadm-fix-infinite-loop-while-recv-returns-0.patch
+patch11: 0011-not-send-stop-message-if-iscsid-absent.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
@@ -88,7 +70,7 @@ Requires: man
 This contains man files for the using of %{name}.
 
 %prep
-%autosetup -n open-iscsi-2.1.1 -p1
+%autosetup -n %{name}-%{version} -p1
 perl -i -pe 's|^exec_prefix = /$|exec_prefix = %{_exec_prefix}|' Makefile
 
 %build
@@ -170,6 +152,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Thu Jan 28 2021 haowenchao <haowenchao@huawei.com> - 2.1.3-1
+- Update open-iscsi version to 2.1.3-1
+
 * Sat Dec 12 2020 haowenchao <haowenchao@huawei.com> - 2.1.1-5
 - Change iscsid service PIDFile to /run/iscsid.ipd
   The pid file has be changed from /var/run/iscsid.pid to

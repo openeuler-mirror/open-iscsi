@@ -1,0 +1,50 @@
+From c6fbda57e25c154a6dfbd31e9e2f64b9efb3cc43 Mon Sep 17 00:00:00 2001
+From: pengyeqing <pengyeqing@huawei.com>
+Date: Thu, 28 Jan 2021 15:37:02 +0800
+Subject: [PATCH] iscsi-initiator-utils: fix iscsiadm logout timeout
+
+reason:fix iscsiadm logout timeout
+
+Conflict: Adapt for open-iscsi-2.1.3 version
+
+Signed-off-by: pengyeqing <pengyeqing@huawei.com>
+---
+ usr/iscsid_req.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/usr/iscsid_req.c b/usr/iscsid_req.c
+index a3aba6d..ca32298 100644
+--- a/usr/iscsid_req.c
++++ b/usr/iscsid_req.c
+@@ -60,6 +60,7 @@ static void iscsid_startup(void)
+ }
+ 
+ #define MAXSLEEP 128
++#define ISCSID_IPC_WAIT_RESPOND 300
+ 
+ static int ipc_connect(int *fd, char *unix_sock_name, int start_iscsid)
+ {
+@@ -145,7 +146,7 @@ int iscsid_response(int fd, iscsiadm_cmd_e cmd, iscsiadm_rsp_t *rsp,
+ 
+ 	if (timeout == -1) {
+ 		timeout = ISCSID_REQ_TIMEOUT;
+-		poll_wait = 1;
++		poll_wait = ISCSID_IPC_WAIT_RESPOND;
+ 	}
+ 	while (len) {
+ 		struct pollfd pfd;
+@@ -154,8 +155,10 @@ int iscsid_response(int fd, iscsiadm_cmd_e cmd, iscsiadm_rsp_t *rsp,
+ 		pfd.events = POLLIN;
+ 		err = poll(&pfd, 1, timeout);
+ 		if (!err) {
+-			if (poll_wait)
++			if (poll_wait--)
+ 				continue;
++			log_warning("wait %d seconds timeout, try again?",
++				ISCSID_IPC_WAIT_RESPOND);
+ 			return ISCSI_ERR_SESSION_NOT_CONNECTED;
+ 		} else if (err < 0) {
+ 			if (errno == EINTR)
+-- 
+1.8.3.1
+
