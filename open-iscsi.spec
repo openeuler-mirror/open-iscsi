@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.1
-Release: 3
+Release: 4
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -28,7 +28,9 @@ Patch16: 0016-iscsi-fix-fd-leak.patch
 Patch17: 0017-Fix-devel-without-node-header-files.patch
 Patch18: 0018-resolve-compilation-errors.patch
 Patch19: 0019-iscsid-Change-iscsid-service-PIDFile-to-run-iscsid.i.patch
-
+Patch20: 0020-check-for-header-length-underflow-during-checksum-ca.patch
+Patch21: 0021-check-for-u8-overflow-when-processing-TCP-options.patch
+Patch22: 0022-check-for-TCP-urgent-pointer-past-end-of-frame.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
@@ -162,6 +164,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Tue Mon 22 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-4
+- Fix CVE-2020-13987 CVE-2020-13988 CVE-2020-17437
+
 * Tue Dec 15 2020 haowenchao <haowenchao@huawei.com> - 2.1.1-3
 - Change iscsid service PIDFile to /run/iscsid.ipd
   The pid file has be changed from /var/run/iscsid.pid to
