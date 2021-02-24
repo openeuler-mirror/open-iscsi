@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.1
-Release: 4
+Release: 5
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -32,6 +32,7 @@ Patch20: 0020-iscsid-Change-iscsid-service-PIDFile-to-run-iscsid.i.patch
 Patch21: 0021-check-for-header-length-underflow-during-checksum-ca.patch
 Patch22: 0022-check-for-u8-overflow-when-processing-TCP-options.patch
 Patch23: 0023-check-for-TCP-urgent-pointer-past-end-of-frame.patch
+Patch24: 0024-fix-iscsiadm-op-new-report-to-cannot-rename-error.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
@@ -164,6 +165,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Mon Feb 22 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-5
+- Fix iscsiadm op new report to can not rename error
+
 * Mon Feb 22 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-4
 - Fix CVE-2020-13987 CVE-2020-13988 CVE-2020-17437
 
