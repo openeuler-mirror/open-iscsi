@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.3
-Release: 1
+Release: 3
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -20,6 +20,9 @@ patch8: 0008-default-file-zero-after-power-outage.patch
 patch9: 0009-Modify-iscsid.service-to-keep-same-with-previous-ver.patch
 patch10: 0010-iscsiadm-fix-infinite-loop-while-recv-returns-0.patch
 patch11: 0011-not-send-stop-message-if-iscsid-absent.patch
+patch12: 0012-fix-iscsiadm-op-new-report-to-cannot-rename-error.patch
+patch13: 0013-iscsiadm-Fix-memory-leak-in-iscsiadm.patch
+patch14: 0014-Fix-iscsiadm-segfault-when-exiting.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
@@ -152,6 +155,12 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Mon Mar 1 2021 haowenchao <haowenchao@huawei.com> - 2.1.3-3
+- Fix iscsiadm segfault when exiting
+
+* Mon Feb 22 2021 haowenchao <haowenchao@huawei.com> - 2.1.3-2
+- Fix iscsiadm op new report to can not rename error
+
 * Thu Jan 28 2021 haowenchao <haowenchao@huawei.com> - 2.1.3-1
 - Update open-iscsi version to 2.1.3-1
 
