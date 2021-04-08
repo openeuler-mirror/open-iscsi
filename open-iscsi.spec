@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.1
-Release: 5
+Release: 6
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -108,7 +108,7 @@ make DESTDIR=%{?buildroot} LIB_DIR=%{_libdir} \
 install -pm 755 usr/iscsistart $RPM_BUILD_ROOT%{_sbindir}
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
 install -pm 644 iscsiuio/iscsiuiolog $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
-install -d $RPM_BUILD_ROOT%{_sharedstatedir}/{iscsi,iscsi/nodes,iscsi/send_targets,iscsi/static,iscsi/isns,iscsi/slp,iscsi/ifaces}
+install -d $RPM_BUILD_ROOT%{_sysconfdir}/{iscsi,iscsi/nodes,iscsi/send_targets,iscsi/static,iscsi/isns,iscsi/slp,iscsi/ifaces}
 install -d $RPM_BUILD_ROOT/var/lock/iscsi
 touch $RPM_BUILD_ROOT/var/lock/iscsi/lock
 
@@ -143,8 +143,8 @@ fi
 
 %files
 %doc README COPYING
-%dir   %{_sharedstatedir}/iscsi
-%dir   %{_sharedstatedir}/iscsi/*
+%dir   %{_sysconfdir}/iscsi
+%dir   %{_sysconfdir}/iscsi/*
 %ghost %{_var}/lock/iscsi
        %{_unitdir}/*
        %{_sbindir}/*
@@ -165,6 +165,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Thu Apr 8 2021 haowenchao <haowenchao@huawei.com> - 2.1.3-6
+- Fix file residual files after open-iscsi removed
+
 * Mon Feb 22 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-5
 - Fix iscsiadm op new report to can not rename error
 
