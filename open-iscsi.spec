@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.1
-Release: 6
+Release: 7
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -36,6 +36,7 @@ Patch24: 0024-fix-iscsiadm-op-new-report-to-cannot-rename-error.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
+Requires:  open-iscsi-help
 
 Provides:  iscsi-initiator-utils
 Obsoletes: iscsi-initiator-utils
@@ -165,7 +166,10 @@ fi
 %{_mandir}/man8/*
 
 %changelog
-* Thu Apr 8 2021 haowenchao <haowenchao@huawei.com> - 2.1.3-6
+* Tue Jul 6 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-7
+- add help for Requires
+
+* Thu Apr 8 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-6
 - Fix file residual files after open-iscsi removed
 
 * Mon Feb 22 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-5
