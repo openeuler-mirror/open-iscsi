@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.1
-Release: 8
+Release: 9
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -165,6 +165,10 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Fri Jul 9 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-9
+- Nothing change but release number to sync with other branch whose major
+  is 2.1.1
+
 * Fri Jul 9 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-8
 - backport one patch for solving install problem, sync from branch openEuler-20.09
   which commit id is 81fd136
