@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.1
-Release: 7
+Release: 8
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -27,6 +27,7 @@ Patch15: 0015-iscsi-Add-break-to-while-loop.patch
 Patch16: 0016-iscsi-fix-fd-leak.patch
 Patch17: 0017-Fix-devel-without-node-header-files.patch
 Patch18: 0018-resolve-compilation-errors.patch
+Patch19: 0019-Update-systemd-unit-files-for-iscsid.patch
 Patch20: 0020-check-for-header-length-underflow-during-checksum-ca.patch
 Patch21: 0021-check-for-u8-overflow-when-processing-TCP-options.patch
 Patch22: 0022-check-for-TCP-urgent-pointer-past-end-of-frame.patch
@@ -164,6 +165,10 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Fri Jul 9 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-8
+- backport one patch for solving install problem, sync from branch openEuler-20.09
+  which commit id is 81fd136
+
 * Mon May 17 2021 haowenchao <haowenchao@huawei.com> - 2.1.3-7
 - Change iscsid.service ExecStopPost to ExecStartPost to fix systemd warning
 
