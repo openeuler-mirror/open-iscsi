@@ -8,14 +8,14 @@ add sleep for service
 Signed-off-by: pengyeqing <pengyeqing@huawei.com>
 Signed-off-by: wuguanghao <wuguanghao3@huawei.com>
 ---
- etc/systemd/iscsid.service | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+ etc/systemd/iscsid.service | 17 ++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
 diff --git a/etc/systemd/iscsid.service b/etc/systemd/iscsid.service
 index 4fef168..f3f8c65 100644
 --- a/etc/systemd/iscsid.service
 +++ b/etc/systemd/iscsid.service
-@@ -1,17 +1,14 @@
+@@ -1,17 +1,16 @@
  [Unit]
  Description=Open-iSCSI
  Documentation=man:iscsid(8) man:iscsiuio(8) man:iscsiadm(8)
@@ -31,10 +31,12 @@ index 4fef168..f3f8c65 100644
 -KillMode=mixed
 -Restart=on-failure
 +Type=forking
-+PIDFile=/var/run/iscsid.pid
++PIDFile=/run/iscsid.pid
 +ExecStart=/sbin/iscsid
-+ExecStopPost=/usr/bin/sleep 1
++ExecStartPost=/usr/bin/sleep 1
 +ExecStop=/sbin/iscsiadm -k 0 2
++Restart=always
++RestartSec=2s
  
  [Install]
  WantedBy=multi-user.target
