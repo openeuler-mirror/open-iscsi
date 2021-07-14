@@ -1,0 +1,31 @@
+From 53034c2ae6d1e4ec659dbace9da02ee8bc48a352 Mon Sep 17 00:00:00 2001
+From: wuguanghao <wuguanghao3@huawei.com>
+Date: Tue, 1 Sep 2020 15:39:46 +0800
+Subject: [PATCH] Update systemd unit files for iscsid
+
+Update systemd unit files for iscsid
+
+Signed-off-by: Lee Duncan <lduncan@suse.com>
+Signed-off-by: wuguanghao <wuguanghao3@huawei.com>
+---
+ etc/systemd/iscsid.service | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/etc/systemd/iscsid.service b/etc/systemd/iscsid.service
+index 2cce190..828877f 100644
+--- a/etc/systemd/iscsid.service
++++ b/etc/systemd/iscsid.service
+@@ -1,7 +1,8 @@
+ [Unit]
+ Description=Open-iSCSI
+-Documentation=man:iscsid(8) man:iscsiuio(8) man:iscsiadm(8)
+-After=network.target NetworkManager-wait-online.service iscsiuio.service tgtd.service targetcli.service
++Documentation=man:iscsid(8) man:iscsiadm(8)
++After=network.target
++DefaultDependencies=no
+ 
+ [Service]
+ Type=forking
+-- 
+1.8.3.1
+
