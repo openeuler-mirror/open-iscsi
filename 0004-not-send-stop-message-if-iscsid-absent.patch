@@ -5,23 +5,9 @@ Subject: [PATCH] iscsi-initiator-utils: not send stop message if iscsid absent
 
 Signed-off-by: pengyeqing <pengyeqing@huawei.com>
 ---
- etc/systemd/iscsid.service |  2 ++
  usr/iscsiadm.c             | 71 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 73 insertions(+)
+ 1 files changed, 71 insertions(+)
 
-diff --git a/etc/systemd/iscsid.service b/etc/systemd/iscsid.service
-index f3f8c65..2cce190 100644
---- a/etc/systemd/iscsid.service
-+++ b/etc/systemd/iscsid.service
-@@ -9,6 +9,8 @@ PIDFile=/var/run/iscsid.pid
- ExecStart=/sbin/iscsid
- ExecStopPost=/usr/bin/sleep 1
- ExecStop=/sbin/iscsiadm -k 0 2
-+Restart=always
-+RestartSec=2s
- 
- [Install]
- WantedBy=multi-user.target
 diff --git a/usr/iscsiadm.c b/usr/iscsiadm.c
 index f2bd721..b386abe 100644
 --- a/usr/iscsiadm.c
