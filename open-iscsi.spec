@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.3
-Release: 4
+Release: 5
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.org
@@ -25,7 +25,7 @@ patch13: 0013-iscsiadm-Fix-memory-leak-in-iscsiadm.patch
 patch14: 0014-Fix-iscsiadm-segfault-when-exiting.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
-BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
+BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config
 
 Provides:  iscsi-initiator-utils
 Obsoletes: iscsi-initiator-utils
@@ -155,6 +155,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Fri Jul 23 2021 zhouwenpei <zhouwenpei1@huawei.com> - 2.1.3-5
+- remove unnecessary build require.
+
 * Thu Apr 8 2021 haowenchao <haowenchao@huawei.com> - 2.1.3-4
 - Fix file residual files after open-iscsi removed
 
