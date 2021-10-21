@@ -4,10 +4,10 @@
 
 Name:    open-iscsi
 Version: 2.1.3
-Release: 5
+Release: 6
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
-URL:     http://www.open-iscsi.org
+URL:     http://www.open-iscsi.com
 Source0: https://github.com/open-iscsi/open-iscsi/archive/2.1.3.tar.gz#/open-iscsi-2.1.3.tar.gz
 patch1: 0001-change-iscsi-iqn-default-value.patch
 patch2: 0002-iscsid-Check-nr_sessions-when-creating-a-copy-of-exi.patch
@@ -155,6 +155,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Thu Oct 21 2021 haowenchao <haowenchao@huawei.com> - 2.1.3-6
+- update upstream URL
+
 * Fri Jul 23 2021 zhouwenpei <zhouwenpei1@huawei.com> - 2.1.3-5
 - remove unnecessary build require.
 
