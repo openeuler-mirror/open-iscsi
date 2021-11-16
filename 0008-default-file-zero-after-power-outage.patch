@@ -9,10 +9,10 @@ Subject: [PATCH] fix default file zero after power outage, fsync file
  1 file changed, 18 insertions(+), 1 deletion(-)
 
 diff --git a/usr/idbm.c b/usr/idbm.c
-index be5f8f9..d431b00 100644
+index 6bd630f..8a8c3a6 100644
 --- a/usr/idbm.c
 +++ b/usr/idbm.c
-@@ -2240,6 +2240,23 @@ open_conf:
+@@ -2263,6 +2263,23 @@ open_conf:
  	}
  
  	idbm_print(IDBM_PRINT_TYPE_NODE, rec, 1, f);
@@ -36,7 +36,7 @@ index be5f8f9..d431b00 100644
  	fclose(f);
  
  	/* add for default_bak -> default */
-@@ -2455,7 +2472,7 @@ int idbm_add_node(node_rec_t *newrec, discovery_rec_t *drec, int overwrite)
+@@ -2478,7 +2495,7 @@ int idbm_add_node(node_rec_t *newrec, discovery_rec_t *drec, int overwrite)
  			goto unlock;
  		}
  
@@ -44,7 +44,7 @@ index be5f8f9..d431b00 100644
 +		rc = idbm_delete_node(newrec);
  		if (rc)
  			goto unlock;
- 		log_debug(7, "overwriting existing record");
+ 
 -- 
 1.8.3.1
 

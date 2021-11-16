@@ -64,18 +64,18 @@ index ffd12a3..e810de9 100644
  				struct signalfd_siginfo si;
  
 diff --git a/usr/iscsid.c b/usr/iscsid.c
-index 3544870..57b0c85 100644
+index 478c83d..cd6f562 100644
 --- a/usr/iscsid.c
 +++ b/usr/iscsid.c
-@@ -61,7 +61,6 @@ struct iscsi_daemon_config daemon_config;
+@@ -66,7 +66,6 @@ struct iscsi_daemon_config daemon_config;
  struct iscsi_daemon_config *dconfig = &daemon_config;
  
  static char program_name[] = "iscsid";
 -static pid_t log_pid;
  static gid_t gid;
- static int daemonize = 1;
+ static bool daemonize = true;
  static int mgmt_ipc_fd;
-@@ -306,6 +305,7 @@ static void iscsid_shutdown(void)
+@@ -311,6 +310,7 @@ static void iscsid_shutdown(void)
  		log_debug(1, "daemon stopping");
  		log_close(log_pid);
  	}
