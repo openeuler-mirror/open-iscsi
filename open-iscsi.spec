@@ -3,12 +3,12 @@
 %global socket_enable()    /bin/systemctl enable %1.socket >/dev/null 2>&1 || :
 
 Name:    open-iscsi
-Version: 2.1.3
-Release: 6
+Version: 2.1.5
+Release: 1
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.com
-Source0: https://github.com/open-iscsi/open-iscsi/archive/2.1.3.tar.gz#/open-iscsi-2.1.3.tar.gz
+Source0: https://github.com/open-iscsi/open-iscsi/archive/2.1.5.tar.gz#/open-iscsi-2.1.5.tar.gz
 patch1: 0001-change-iscsi-iqn-default-value.patch
 patch2: 0002-iscsid-Check-nr_sessions-when-creating-a-copy-of-exi.patch
 patch3: 0003-restart-log-daemon-when-exited-abnormally.patch
@@ -17,12 +17,9 @@ patch5: 0005-do-not-sync-session-when-a-session-is-already-created.patch
 patch6: 0006-fix-default-file-corrupt.patch
 patch7: 0007-fix-iscsiadm-logout-timeout.patch
 patch8: 0008-default-file-zero-after-power-outage.patch
-patch9: 0009-Modify-iscsid.service-to-keep-same-with-previous-ver.patch
-patch10: 0010-iscsiadm-fix-infinite-loop-while-recv-returns-0.patch
-patch11: 0011-not-send-stop-message-if-iscsid-absent.patch
-patch12: 0012-fix-iscsiadm-op-new-report-to-cannot-rename-error.patch
-patch13: 0013-iscsiadm-Fix-memory-leak-in-iscsiadm.patch
-patch14: 0014-Fix-iscsiadm-segfault-when-exiting.patch
+patch9: 0009-not-send-stop-message-if-iscsid-absent.patch
+patch10: 0010-fix-iscsiadm-op-new-report-to-cannot-rename-error.patch
+patch11: 0011-Fix-compiler-error-introduced-with-recent-IPv6-commi.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config
@@ -139,6 +136,8 @@ fi
        %{_unitdir}/*
        %{_sbindir}/*
        %{_libdir}/libopeniscsiusr.so.*
+%exclude %{_unitdir}/iscsi-init.service
+
 
 %dir   %{_sysconfdir}/iscsi
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/iscsi/iscsid.conf
@@ -155,6 +154,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Tue Nov 16 2021 haowenchao <haowenchao@huawei.com> - 2.1.5-1
+- Update open-iscsi version to 2.1.5-1
+
 * Thu Oct 21 2021 haowenchao <haowenchao@huawei.com> - 2.1.3-6
 - update upstream URL
 
