@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.5
-Release: 2
+Release: 3
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.com
@@ -21,6 +21,7 @@ patch9: 0009-not-send-stop-message-if-iscsid-absent.patch
 patch10: 0010-fix-iscsiadm-op-new-report-to-cannot-rename-error.patch
 patch11: 0011-Fix-compiler-error-introduced-with-recent-IPv6-commi.patch
 patch12: 0012-Remove-iscsid.service-s-dependence-of-iscsi-init.ser.patch
+patch13: 0013-Remove-session-info-password-print.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config
@@ -155,6 +156,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Tue Jan 25 2022 haowenchao <haowenchao@huawei.com> - 2.1.5-3
+- Remove password print in session info display
+
 * Mon Dec 6 2021 haowenchao <haowenchao@huawei.com> - 2.1.5-2
 - Remove iscsid's dependence of iscsid-init.service
 
