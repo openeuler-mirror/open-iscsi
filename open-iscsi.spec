@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.1
-Release: 10
+Release: 11
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.com
@@ -32,6 +32,7 @@ Patch20: 0020-check-for-header-length-underflow-during-checksum-ca.patch
 Patch21: 0021-check-for-u8-overflow-when-processing-TCP-options.patch
 Patch22: 0022-check-for-TCP-urgent-pointer-past-end-of-frame.patch
 Patch23: 0023-fix-iscsiadm-op-new-report-to-cannot-rename-error.patch
+patch24: 0024-Remove-session-info-password-print.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config gdb
@@ -165,6 +166,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Thu Oct 21 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-11
+- Remove password print in session info display
+
 * Thu Oct 21 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-10
 - Update URL
 
