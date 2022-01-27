@@ -1,0 +1,52 @@
+From 3ae85fdd120146eb7abcf25bb4588baec85076bf Mon Sep 17 00:00:00 2001
+From: Wenchao Hao <haowenchao@huawei.com>
+Date: Thu, 27 Jan 2022 10:11:12 +0800
+Subject: [PATCH 3/3] Remove iscsiuio from config and service file
+
+iscsiuio is to be used in conjunction with specific linux driver to
+improve performance, such as QLogic NetXtreme II or QLogic CNIC driver.
+It is not a necessary tool of open-iscsi.
+
+What's more, iscsiuio used a package uio which is out of maintain now,
+which would introduce CVEs unhandled. So I want to remove this tool
+from open-iscsi.
+
+This patch removes iscsiuio from config and service file
+
+Signed-off-by: Wenchao Hao <haowenchao@huawei.com>
+---
+ etc/iscsid.conf            | 2 +-
+ etc/systemd/iscsid.service | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/etc/iscsid.conf b/etc/iscsid.conf
+index f21ed3d..8d2808e 100644
+--- a/etc/iscsid.conf
++++ b/etc/iscsid.conf
+@@ -19,7 +19,7 @@
+ # the time then leave this attribute commented out.
+ #
+ # Default for Fedora and RHEL. (uncomment to activate).
+-# iscsid.startup = /bin/systemctl start iscsid.socket iscsiuio.socket
++# iscsid.startup = /bin/systemctl start iscsid.socket
+ #
+ # Default if you are not using systemd (uncomment to activate)
+ # iscsid.startup = /usr/bin/service start iscsid
+diff --git a/etc/systemd/iscsid.service b/etc/systemd/iscsid.service
+index 70c7fbd..49347f5 100644
+--- a/etc/systemd/iscsid.service
++++ b/etc/systemd/iscsid.service
+@@ -1,8 +1,8 @@
+ [Unit]
+ Description=Open-iSCSI
+-Documentation=man:iscsid(8) man:iscsiuio(8) man:iscsiadm(8)
++Documentation=man:iscsid(8) man:iscsiadm(8)
+ DefaultDependencies=no
+-After=network-online.target iscsiuio.service iscsi-init.service
++After=network-online.target iscsi-init.service
+ Before=remote-fs-pre.target
+ Wants=remote-fs-pre.target
+ 
+-- 
+2.34.1
+
