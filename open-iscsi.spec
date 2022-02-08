@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.5
-Release: 3
+Release: 4
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.com
@@ -22,6 +22,9 @@ patch10: 0010-fix-iscsiadm-op-new-report-to-cannot-rename-error.patch
 patch11: 0011-Fix-compiler-error-introduced-with-recent-IPv6-commi.patch
 patch12: 0012-Remove-iscsid.service-s-dependence-of-iscsi-init.ser.patch
 patch13: 0013-Remove-session-info-password-print.patch
+patch14: 0014-Remove-iscsiuio-from-build-and-install-recipe.patch
+patch15: 0015-Remove-iscsiuio-source-code.patch
+patch16: 0016-Remove-iscsiuio-from-config-and-service-file.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config
@@ -76,12 +79,6 @@ This contains man files for the using of %{name}.
 perl -i -pe 's|^exec_prefix = /$|exec_prefix = %{_exec_prefix}|' Makefile
 
 %build
-cd iscsiuio
-touch AUTHORS NEWS
-autoreconf --install
-%{configure}
-cd ..
-
 %make_build OPTFLAGS="%{optflags} %{?__global_ldflags} -DUSE_KMOD -lkmod" LIB_DIR=%{_libdir}
 
 
@@ -96,7 +93,6 @@ make DESTDIR=%{?buildroot} LIB_DIR=%{_libdir} \
 
 install -pm 755 usr/iscsistart $RPM_BUILD_ROOT%{_sbindir}
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
-install -pm 644 iscsiuio/iscsiuiolog $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
 install -d $RPM_BUILD_ROOT%{_sysconfdir}/{iscsi,iscsi/nodes,iscsi/send_targets,iscsi/static,iscsi/isns,iscsi/slp,iscsi/ifaces}
 install -d $RPM_BUILD_ROOT/var/lock/iscsi
 touch $RPM_BUILD_ROOT/var/lock/iscsi/lock
@@ -143,7 +139,6 @@ fi
 
 %dir   %{_sysconfdir}/iscsi
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/iscsi/iscsid.conf
-       %config(noreplace) %{_sysconfdir}/logrotate.d/iscsiuiolog
        %config %{_sysconfdir}/iscsi/ifaces/iface.example
 %ghost %{_sysconfdir}/iscsi/initiatorname.iscsi
 
@@ -156,6 +151,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Thu Jan 26 2022 haowenchao <haowenchao@huawei.com> - 2.1.5-4
+- Remove tool iscsiuio
+
 * Tue Jan 25 2022 haowenchao <haowenchao@huawei.com> - 2.1.5-3
 - Remove password print in session info display
 
