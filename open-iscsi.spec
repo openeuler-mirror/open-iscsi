@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.5
-Release: 4
+Release: 5
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.com
@@ -25,6 +25,7 @@ patch13: 0013-Remove-session-info-password-print.patch
 patch14: 0014-Remove-iscsiuio-from-build-and-install-recipe.patch
 patch15: 0015-Remove-iscsiuio-source-code.patch
 patch16: 0016-Remove-iscsiuio-from-config-and-service-file.patch
+patch17: 0017-Remove-iscsi-init.service-from-iscsi-and-iscsid-serv.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config
@@ -151,6 +152,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Tue Feb 8 2021 haowenchao <haowenchao@huawei.com> - 2.1.5-5
+- Remove iscsi's dependence of iscsid-init.service
+
 * Thu Jan 26 2022 haowenchao <haowenchao@huawei.com> - 2.1.5-4
 - Remove tool iscsiuio
 
