@@ -1,0 +1,46 @@
+From d4a13200efd215d5b115db60f075921c5e67cc57 Mon Sep 17 00:00:00 2001
+From: Wenchao Hao <haowenchao@huawei.com>
+Date: Wed, 2 Feb 2022 16:09:05 +0800
+Subject: [PATCH] initiator_common: make set operational parameter log easy to
+ read
+
+iscsid would print log like following if debug level is larger than 3:
+
+iscsid: set operational parameter 35 to:
+iscsid: 30
+iscsid: set operational parameter 30 to:
+iscsid: 5
+
+which is not friendly to read, this commit makes it easy to read,
+like this:
+
+iscsid: set operational parameter 35 to: 30
+iscsid: set operational parameter 30 to: 5
+
+Signed-off-by: Wenchao Hao <haowenchao@huawei.com>
+---
+ usr/initiator_common.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/usr/initiator_common.c b/usr/initiator_common.c
+index 6cf26c1..bc69fbd 100644
+--- a/usr/initiator_common.c
++++ b/usr/initiator_common.c
+@@ -273,12 +273,10 @@ static int host_set_param(struct iscsi_transport *t,
+ 
+ static void print_param_value(enum iscsi_param param, void *value, int type)
+ {
+-	log_debug(3, "set operational parameter %d to:", param);
+-
+ 	if (type == ISCSI_STRING)
+-		log_debug(3, "%s", value ? (char *)value : "NULL");
++		log_debug(3, "set operational parameter %d to %s", param, value ? (char *)value : "NULL");
+ 	else
+-		log_debug(3, "%u", *(uint32_t *)value);
++		log_debug(3, "set operational parameter %d to %u", param, *(uint32_t *)value);
+ }
+ 
+ #define MAX_HOST_PARAMS 2
+-- 
+2.27.0
+

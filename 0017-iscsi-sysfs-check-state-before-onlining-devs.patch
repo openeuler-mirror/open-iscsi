@@ -1,0 +1,75 @@
+From 245a547c61a9356cdb7dba0032c09ad58c17143b Mon Sep 17 00:00:00 2001
+From: Mike Christie <michael.christie@oracle.com>
+Date: Fri, 5 Nov 2021 16:33:20 -0500
+Subject: [PATCH] iscsi sysfs: check state before onlining devs
+
+In 5.6, the commit:
+
+commit 0ab710458da113a71c461c4df27e7f1353d9f864
+Author: Bharath Ravi <rbharath@google.com>
+Date:   Sat Jan 25 01:19:25 2020 -0500
+
+    scsi: iscsi: Perform connection failure entirely in kernel space
+
+made it so the kernel can start the recovery process. This means that
+after the start conn operation the kernel could set the device into the
+block stated. We can then hit a race where iscsid has done start conn,
+and is calling session_online_devs but the kernel has hit an issue and is
+now setting the device's to blocked.
+
+This adds a check for if the device is in the offline state before trying
+to set the state to running.
+---
+ usr/iscsi_sysfs.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
+
+diff --git a/usr/iscsi_sysfs.c b/usr/iscsi_sysfs.c
+index abefde2..7bb834a 100644
+--- a/usr/iscsi_sysfs.c
++++ b/usr/iscsi_sysfs.c
+@@ -1929,18 +1929,41 @@ void iscsi_sysfs_set_queue_depth(void *data, int hostno, int target, int lun)
+ void iscsi_sysfs_set_device_online(__attribute__((unused))void *data,
+ 				   int hostno, int target, int lun)
+ {
+-	char *write_buf = "running\n";
++	char *write_buf = "running\n", *state;
+ 	char id[NAME_SIZE];
+ 	int err;
+ 
+ 	snprintf(id, sizeof(id), "%d:0:%d:%d", hostno, target, lun);
+ 	log_debug(4, "online device %s", id);
+ 
++	state = sysfs_get_value(id, SCSI_SUBSYS, "state");
++	if (!state) {
++		log_error("Could not read state for LUN %s\n", id);
++		goto set_state;
++	}
++
++	if (!strcmp(state, "running"))
++		goto done;
++	/*
++	 * The kernel can start to perform session level recovery cleanup
++	 * any time after the conn start call, so we only want to change the
++	 * state if we are in one of the offline states.
++	 */
++	if (strcmp(state, "offline") && strcmp(state, "transport-offline")) {
++		log_debug(4, "Dev not offline. Skip onlining %s", id);
++		goto done;
++	}
++
++set_state:
+ 	err = sysfs_set_param(id, SCSI_SUBSYS, "state", write_buf,
+ 			      strlen(write_buf));
+ 	if (err && err != EINVAL)
+ 		/* we should read the state */
+ 		log_error("Could not online LUN %d err %d.", lun, err);
++
++done:
++	if (state)
++		free(state);
+ }
+ 
+ void iscsi_sysfs_rescan_device(__attribute__((unused))void *data,
+-- 
+2.27.0
+
