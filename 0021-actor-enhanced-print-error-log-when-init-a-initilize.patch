@@ -1,0 +1,31 @@
+From 0b9675a2263174060b11e459fcfd554b10f9ca1e Mon Sep 17 00:00:00 2001
+From: Wenchao Hao <haowenchao@huawei.com>
+Date: Wed, 2 Feb 2022 12:13:16 +0800
+Subject: [PATCH] actor: enhanced: print error log when init a initilized
+ thread
+
+This is only a enhance, do not change origin logic
+
+Signed-off-by: Wenchao Hao <haowenchao@huawei.com>
+---
+ usr/actor.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/usr/actor.c b/usr/actor.c
+index dc008a7..a6bb02f 100644
+--- a/usr/actor.c
++++ b/usr/actor.c
+@@ -45,6 +45,10 @@ actor_time_left(actor_t *thread, time_t current_time)
+ void
+ actor_init(actor_t *thread, void (*callback)(void *), void *data)
+ {
++	if (thread->state != ACTOR_INVALID)
++		log_error("bug:thread %p has already been initialized",
++			  thread);
++
+ 	INIT_LIST_HEAD(&thread->list);
+ 	thread->state = ACTOR_NOTSCHEDULED;
+ 	thread->callback = callback;
+-- 
+2.27.0
+
