@@ -1,0 +1,38 @@
+From 6c54bf1ee7cd3f31cd0f55459809e739fe9a85de Mon Sep 17 00:00:00 2001
+From: Wenchao Hao <haowenchao@huawei.com>
+Date: Fri, 19 Nov 2021 22:21:58 +0800
+Subject: [PATCH] iscsiadm: Call log_init() first to fix a segmentation fault
+
+log_init() should be called before log_error()
+
+Signed-off-by: Wenchao Hao <haowenchao@huawei.com>
+---
+ usr/iscsiadm.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/usr/iscsiadm.c b/usr/iscsiadm.c
+index 192da66..0467db5 100644
+--- a/usr/iscsiadm.c
++++ b/usr/iscsiadm.c
+@@ -3599,6 +3599,9 @@ main(int argc, char **argv)
+ 	struct iscsi_session *se = NULL;
+ 	bool wait = true;
+ 
++	/* enable stdout logging */
++	log_init(program_name, 1024, log_do_log_std, NULL);
++
+ 	ctx = iscsi_context_new();
+ 	if (ctx == NULL) {
+ 		log_error("No memory");
+@@ -3616,8 +3619,6 @@ main(int argc, char **argv)
+ 
+ 	umask(0077);
+ 
+-	/* enable stdout logging */
+-	log_init(program_name, 1024, log_do_log_std, NULL);
+ 	sysfs_init();
+ 
+ 	optopt = 0;
+-- 
+2.27.0
+

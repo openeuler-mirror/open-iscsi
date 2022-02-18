@@ -1,0 +1,44 @@
+From 1cab1efc813f750f9fa68e35dc16e8e54a1ba1e8 Mon Sep 17 00:00:00 2001
+From: Lee Duncan <lduncan@suse.com>
+Date: Wed, 26 Jan 2022 11:44:09 -0800
+Subject: [PATCH] Fix more issues discovered by gcc12
+
+Gcc-12 caught a few more errors in the code, where we are
+still checking an array address for NULL, which will never
+happen.
+---
+ usr/discovery.c   | 2 +-
+ usr/iscsi_sysfs.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/usr/discovery.c b/usr/discovery.c
+index 7dec696..587af6d 100644
+--- a/usr/discovery.c
++++ b/usr/discovery.c
+@@ -623,7 +623,7 @@ add_target_record(char *name, char *end, discovery_rec_t *drec,
+ 
+ 	/* if no address is provided, use the default */
+ 	if (text >= end) {
+-		if (drec->address == NULL) {
++		if (drec->address[0] == '\0') {
+ 			log_error("no default address known for target %s",
+ 				  name);
+ 			return 0;
+diff --git a/usr/iscsi_sysfs.c b/usr/iscsi_sysfs.c
+index 7bb834a..9a591be 100644
+--- a/usr/iscsi_sysfs.c
++++ b/usr/iscsi_sysfs.c
+@@ -1416,8 +1416,8 @@ int iscsi_sysfs_get_sessioninfo_by_id(struct session_info *info, char *session)
+ 	log_debug(7, "found targetname %s address %s pers address %s port %d "
+ 		 "pers port %d driver %s iface name %s ipaddress %s "
+ 		 "netdev %s hwaddress %s iname %s",
+-		  info->targetname, info->address ? info->address : "NA",
+-		  info->persistent_address ? info->persistent_address : "NA",
++		  info->targetname, info->address[0] ? info->address : "NA",
++		  info->persistent_address[0] ? info->persistent_address : "NA",
+ 		  info->port, info->persistent_port, info->iface.transport_name,
+ 		  info->iface.name, info->iface.ipaddress,
+ 		  info->iface.netdev, info->iface.hwaddress,
+-- 
+2.27.0
+
