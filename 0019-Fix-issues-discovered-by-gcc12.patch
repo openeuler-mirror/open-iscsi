@@ -1,0 +1,98 @@
+From 151e701d08e16dce545d017e57c3d5ac957b7c1e Mon Sep 17 00:00:00 2001
+From: Lee Duncan <lduncan@suse.com>
+Date: Tue, 25 Jan 2022 10:11:58 -0800
+Subject: [PATCH] Fix issues discovered by gcc12
+
+Gcc-12 caught a few errors in the code where we were checking
+for an array being empty incorrectly, so this commit fixes those.
+---
+ usr/auth.c  |  3 +--
+ usr/login.c | 18 +++++++++---------
+ 2 files changed, 10 insertions(+), 11 deletions(-)
+
+diff --git a/usr/auth.c b/usr/auth.c
+index 2f7506f..46c328e 100644
+--- a/usr/auth.c
++++ b/usr/auth.c
+@@ -109,7 +109,7 @@ acl_chap_auth_request(struct iscsi_acl *client, char *username, unsigned int id,
+ 	unsigned char verify_data[client->chap_challenge_len];
+ 
+ 	/* the expected credentials are in the session */
+-	if (session->username_in == NULL) {
++	if (session->username_in[0] == '\0') {
+ 		log_error("failing authentication, no incoming username "
+ 			  "configured to authenticate target %s",
+ 			  session->target_name);
+@@ -122,7 +122,6 @@ acl_chap_auth_request(struct iscsi_acl *client, char *username, unsigned int id,
+ 	}
+ 
+ 	if ((session->password_in_length < 1) ||
+-	    (session->password_in == NULL) ||
+ 	    (session->password_in[0] == '\0')) {
+ 		log_error("failing authentication, no incoming password "
+ 		       "configured to authenticate target %s",
+diff --git a/usr/login.c b/usr/login.c
+index 8af8756..096deda 100644
+--- a/usr/login.c
++++ b/usr/login.c
+@@ -657,7 +657,7 @@ iscsi_process_login_response(iscsi_session_t *session, int cid,
+ 	struct iscsi_acl *auth_client;
+ 	iscsi_conn_t *conn = &session->conn[cid];
+ 
+-	auth_client = (session->auth_buffers && session->num_auth_buffers) ?
++	auth_client = (session->num_auth_buffers > 0) ?
+ 		(struct iscsi_acl *)session->auth_buffers[0].address : NULL;
+ 
+ 	end = text + ntoh24(login_rsp->dlength) + 1;
+@@ -1135,7 +1135,7 @@ iscsi_make_login_pdu(iscsi_session_t *session, int cid, struct iscsi_hdr *hdr,
+ 	struct iscsi_acl *auth_client;
+ 	iscsi_conn_t *conn = &session->conn[cid];
+ 
+-	auth_client = (session->auth_buffers && session->num_auth_buffers) ?
++	auth_client = (session->num_auth_buffers > 0) ?
+ 		(struct iscsi_acl *)session->auth_buffers[0].address : NULL;
+ 
+ 	/* initialize the PDU header */
+@@ -1170,7 +1170,7 @@ iscsi_make_login_pdu(iscsi_session_t *session, int cid, struct iscsi_hdr *hdr,
+ 				return 0;
+ 		}
+ 
+-		if ((session->target_name && session->target_name[0]) &&
++		if ((session->target_name[0] != '\0') &&
+ 		    (session->type == ISCSI_SESSION_TYPE_NORMAL)) {
+ 			if (!iscsi_add_text(hdr, data, max_data_length,
+ 			    "TargetName", session->target_name))
+@@ -1248,16 +1248,16 @@ check_for_authentication(iscsi_session_t *session,
+ 		return LOGIN_FAILED;
+ 	}
+ 
+-	if (session->username &&
++	if ((session->username[0] != '\0') &&
+ 	    (acl_set_user_name(auth_client, session->username) !=
+-	    AUTH_STATUS_NO_ERROR)) {
++	     AUTH_STATUS_NO_ERROR)) {
+ 		log_error("Couldn't set username");
+ 		goto end;
+ 	}
+ 
+-	if (session->password && (acl_set_passwd(auth_client,
+-	    session->password, session->password_length) !=
+-		 AUTH_STATUS_NO_ERROR)) {
++	if ((session->password[0] != '\0') &&
++       	    (acl_set_passwd(auth_client, session->password, session->password_length) !=
++	     AUTH_STATUS_NO_ERROR)) {
+ 		log_error("Couldn't set password");
+ 		goto end;
+ 	}
+@@ -1366,7 +1366,7 @@ iscsi_login_begin(iscsi_session_t *session, iscsi_login_context_t *c)
+ 	conn->current_stage = ISCSI_INITIAL_LOGIN_STAGE;
+ 	conn->partial_response = 0;
+ 
+-	if (session->auth_buffers && session->num_auth_buffers) {
++	if (session->num_auth_buffers > 0) {
+ 		c->ret = check_for_authentication(session, c->auth_client);
+ 		if (c->ret != LOGIN_OK)
+ 			return 1;
+-- 
+2.27.0
+
