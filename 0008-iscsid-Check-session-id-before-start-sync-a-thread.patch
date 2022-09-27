@@ -1,0 +1,59 @@
+From 88fa76cec740cc44b7c4b9b384a87ef6c1288174 Mon Sep 17 00:00:00 2001
+From: Wenchao Hao <haowenchao@huawei.com>
+Date: Tue, 8 Feb 2022 10:40:33 +0800
+Subject: [PATCH] iscsid: Check session id before start sync a thread
+
+If session id has already been synced just return ISCSI_ERR_SESS_EXISTS.
+
+A same session id would make two MGMT_IPC_SESSION_SYNC requests in
+following scenario:
+
+iscsid.socket is enabled, and iscsid did not handle previous
+MGMT_IPC_SESSION_SYNC due to abnormal exit. This MGMT_IPC_SESSION_SYNC
+request would left unhandled, when iscsid restart again, newly started
+iscsid can get this MGMT_IPC_SESSION_SYNC request.
+
+While the newly started iscsid would make a MGMT_IPC_SESSION_SYNC
+request for same session id too.
+
+So here should check if the session id has already been synced.
+
+Signed-off-by: Wenchao Hao <haowenchao@huawei.com>
+---
+ usr/initiator.c | 4 ++++
+ usr/iscsid.c    | 3 +++
+ 2 files changed, 7 insertions(+)
+
+diff --git a/usr/initiator.c b/usr/initiator.c
+index 684647c..4ec00b0 100644
+--- a/usr/initiator.c
++++ b/usr/initiator.c
+@@ -2012,6 +2012,10 @@ iscsi_sync_session(node_rec_t *rec, queue_task_t *qtask, uint32_t sid)
+ 	struct iscsi_transport *t;
+ 	int err;
+ 
++	session = session_find_by_sid(sid);
++	if (session != NULL)
++		return ISCSI_ERR_SESS_EXISTS;
++
+ 	t = iscsi_sysfs_get_transport_by_name(rec->iface.transport_name);
+ 	if (!t)
+ 		return ISCSI_ERR_TRANS_NOT_FOUND;
+diff --git a/usr/iscsid.c b/usr/iscsid.c
+index 478c83d..e5bd1f5 100644
+--- a/usr/iscsid.c
++++ b/usr/iscsid.c
+@@ -289,7 +289,10 @@ retry:
+ 		retries++;
+ 		sleep(1);
+ 		goto retry;
++	} else if (rc == ISCSI_ERR_SESS_EXISTS) {
++		log_debug(1, "sync session %d returned ISCSI_ERR_SESS_EXISTS", info->sid);
+ 	}
++
+ 	return 0;
+ }
+ 
+-- 
+2.27.0
+
