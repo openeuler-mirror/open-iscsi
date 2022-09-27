@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.5
-Release: 8
+Release: 9
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.com
@@ -13,7 +13,7 @@ patch1: 0001-change-iscsi-iqn-default-value.patch
 patch2: 0002-iscsid-Check-nr_sessions-when-creating-a-copy-of-exi.patch
 patch3: 0003-restart-log-daemon-when-exited-abnormally.patch
 patch4: 0004-check-initiator-name-out-of-range.patch
-patch5: 0005-do-not-sync-session-when-a-session-is-already-created.patch
+patch5: 0005-iscsid-Check-session-id-before-start-sync-a-thread.patch
 patch6: 0006-fix-default-file-corrupt.patch
 patch7: 0007-fix-iscsiadm-logout-timeout.patch
 patch8: 0008-default-file-zero-after-power-outage.patch
@@ -158,6 +158,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Tue Sep 27 2022 haowenchao <haowenchao@huawei.com> - 2.1.5-9
+- Substitute self-developed patch with mainline patch
+
 * Thu Jun 23 2022 haowenchao <haowenchao@huawei.com> - 2.1.5-8
 - Remove unused fwparam_ibft.[ch] files in fwparam_ibft
 
