@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.1
-Release: 11
+Release: 12
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.com
@@ -16,7 +16,7 @@ Patch4: 0004-not-send-stop-message-if-iscsid-absent.patch
 Patch5: 0005-iscsid-SIGTERM-syncprocess-hang.patch
 Patch6: 0006-restart-log-daemon-when-exited-abnormally.patch
 Patch7: 0007-check-initiator-name-out-of-range.patch
-Patch8: 0008-do-not-sync-session-when-a-session-is-already-created.patch
+Patch8: 0008-iscsid-Check-session-id-before-start-sync-a-thread.patch
 Patch9: 0009-fix-default-file-corrupt.patch
 Patch10: 0010-iscsiadm-fix-infinite-loop-while-recv-returns-0.patch
 Patch11: 0011-fix-iscsiadm-logout-timeout.patch
@@ -166,6 +166,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Tue Sep 27 2022 haowenchao <haowenchao@huawei.com> - 2.1.1-12
+- Substitute self-developed patch with mainline patch
+
 * Thu Oct 21 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-11
 - Remove password print in session info display
 
