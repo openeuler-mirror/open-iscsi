@@ -189,10 +189,10 @@ fi
 * Thu Apr 8 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-6
 - Fix file residual files after open-iscsi removed
 
-* Tue Mon 22 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-5
+* Mon Feb 22 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-5
 - Fix iscsiadm op new report to cannot rename error
 
-* Tue Mon 22 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-4
+* Mon Feb 22 2021 haowenchao <haowenchao@huawei.com> - 2.1.1-4
 - Fix CVE-2020-13987 CVE-2020-13988 CVE-2020-17437
 
 * Tue Dec 15 2020 haowenchao <haowenchao@huawei.com> - 2.1.1-3
