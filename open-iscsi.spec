@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.5
-Release: 9
+Release: 10
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.com
@@ -32,6 +32,9 @@ patch20: 0020-Fix-more-issues-discovered-by-gcc12.patch
 patch21: 0021-actor-enhanced-print-error-log-when-init-a-initilize.patch
 patch22: 0022-initiator_common-make-set-operational-parameter-log-.patch
 patch23: 0023-Remove-unused-fwparam_ibft.-ch-files-in-fwparam_ibft.patch
+patch24: 0024-Fix-a-possible-passing-null-pointer-in-usr-iface.c-3.patch
+patch25: 0025-iscsid-iscsiuio-fix-OOM-adjustment-377.patch
+
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config
@@ -158,6 +161,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Fri Dec 2 2022 haowenchao <haowenchao@huawei.com> - 2.1.5-10
+- Backport bugfix patches from mainline
+
 * Tue Sep 27 2022 haowenchao <haowenchao@huawei.com> - 2.1.5-9
 - Substitute self-developed patch with mainline patch
 
