@@ -1,0 +1,31 @@
+From bf9f8bc774fbd4f7a1bb79452645aac2c82d950b Mon Sep 17 00:00:00 2001
+From: shugaley <54910986+shugaley@users.noreply.github.com>
+Date: Thu, 28 Jul 2022 21:57:37 +0300
+Subject: [PATCH 1/2] Fix a possible passing null pointer in usr/iface.c (#356)
+
+---
+ usr/iface.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/usr/iface.c b/usr/iface.c
+index 9db73c3..3fed236 100644
+--- a/usr/iface.c
++++ b/usr/iface.c
+@@ -1013,9 +1013,11 @@ static bool ipaddr_is_ipv6(char *ipaddr)
+ 			    (second_colon != first_colon))
+ 				res = true;
+ 		}
+-	}
+-	log_debug(8, "%s(%s) -> %u",
+-		__FUNCTION__, ipaddr, res);
++		log_debug(8, "%s(%s) -> %u",
++			__FUNCTION__, ipaddr, res);
++	} else
++		log_debug(8, "%s(nil) -> %u",
++			__FUNCTION__, res);
+ 	return res;
+ }
+ 
+-- 
+2.27.0
+
