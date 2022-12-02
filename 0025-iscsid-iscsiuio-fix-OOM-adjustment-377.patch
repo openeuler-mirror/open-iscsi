@@ -1,0 +1,114 @@
+From a64d26f81ce084a59c36e15b1adb87434e3858ea Mon Sep 17 00:00:00 2001
+From: Lee Duncan <lduncan@suse.com>
+Date: Fri, 14 Oct 2022 10:56:59 -0700
+Subject: [PATCH] iscsid/iscsiuio: fix OOM adjustment (#377)
+
+* iscsid/iscsiuio: fix OOM adjustment
+
+For both the iscsid and iscsiuio daemons, they try to modify
+nice value and OOM adjustment value, so they have priority
+and will not be killed by the OOM-killer.
+
+But the code incorrectly set the value to "-17" for modern
+linux systems, when the maximum is actually "-1000". While
+making the changes, use "/proc/self/..." instead of
+"/proc/<PID>/...", so we don't have to use getpid() nor
+print out the pathname. Now we either write "-16" to
+the old interface, "-1000" to the new interface, or we
+print a warning.
+
+Several "log_debug()" calls that should have been warnings
+are changed to "log_warning()" calls in iscsid.
+
+* iscsid/iscsiuio: fix OOM adjustment value for older systems
+
+On older linux system, "-17" is the maximum, not "-16".
+---
+ usr/iscsi_util.c | 47 +++++++++++++++++++++++++++--------------------
+ usr/iscsid.c     |  2 +-
+ 2 files changed, 28 insertions(+), 21 deletions(-)
+
+diff --git a/usr/iscsi_util.c b/usr/iscsi_util.c
+index fd8fc0c..3e0528f 100644
+--- a/usr/iscsi_util.c
++++ b/usr/iscsi_util.c
+@@ -65,36 +65,43 @@ void daemon_init(void)
+ 	close(fd);
+ }
+ 
+-#define ISCSI_OOM_PATH_LEN 48
+-
++/*
++ * make a best effort at ajusting our nice
++ * score and our OOM score, but it's not considered
++ * fatal if either adjustment fails
++ *
++ * return 0 on success of OOM adjustment
++ */
+ int oom_adjust(void)
+ {
+ 	int fd;
+-	char path[ISCSI_OOM_PATH_LEN];
+-	struct stat statb;
++	int res = 0;
+ 
+ 	errno = 0;
+ 	if (nice(-10) == -1 && errno != 0)
+-		log_debug(1, "Could not increase process priority: %s",
++		log_warning("Could not increase process priority: %s",
+ 			  strerror(errno));
+ 
+-	snprintf(path, ISCSI_OOM_PATH_LEN, "/proc/%d/oom_score_adj", getpid());
+-	if (stat(path, &statb)) {
+-		/* older kernel so use old oom_adj file */
+-		snprintf(path, ISCSI_OOM_PATH_LEN, "/proc/%d/oom_adj",
+-			 getpid());
+-	}
+-	fd = open(path, O_WRONLY);
+-	if (fd < 0)
++	/*
++	 * try the modern method of adjusting our OOM score,
++	 * then try the old one, if that fails
++	 */
++	if ((fd = open("/proc/self/oom_score_adj", O_WRONLY)) >= 0) {
++		if ((res = write(fd, "-1000", 5)) < 0)
++			log_warning("Could not set /proc/self/oom_score_adj to -1000: %s",
++				strerror(errno));
++	} else if ((fd = open("/proc/self/oom_adj", O_WRONLY)) >= 0) {
++		if ((res = write(fd, "-17", 3)) < 0)
++			log_warning("Could not set /proc/self/oom_adj to -16: %s",
++				strerror(errno));
++	} else
+ 		return -1;
+-	if (write(fd, "-16", 3) < 0) /* for 2.6.11 */
+-		log_debug(1, "Could not set oom score to -16: %s",
+-			  strerror(errno));
+-	if (write(fd, "-17", 3) < 0) /* for Andrea's patch */
+-		log_debug(1, "Could not set oom score to -17: %s",
+-			  strerror(errno));
++
+ 	close(fd);
+-	return 0;
++	if (res < 0)
++		return res;
++	else
++		return 0;
+ }
+ 
+ char*
+diff --git a/usr/iscsid.c b/usr/iscsid.c
+index 138e6b7..b2bfac7 100644
+--- a/usr/iscsid.c
++++ b/usr/iscsid.c
+@@ -592,7 +592,7 @@ int main(int argc, char *argv[])
+ 
+ 	/* oom-killer will not kill us at the night... */
+ 	if (oom_adjust())
+-		log_debug(1, "can not adjust oom-killer's pardon");
++		log_warning("Cannot adjust oom-killer's pardon");
+ 
+ 	/* we don't want our active sessions to be paged out... */
+ 	if (mlockall(MCL_CURRENT | MCL_FUTURE)) {
+-- 
+2.27.0
+
