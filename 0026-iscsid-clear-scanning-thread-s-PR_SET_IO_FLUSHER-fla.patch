@@ -1,0 +1,150 @@
+From 138a5306fc9238d0becf3cc8a5d90ca0b9d71f72 Mon Sep 17 00:00:00 2001
+From: Wenchao Hao <73930449+wenchao-hao@users.noreply.github.com>
+Date: Thu, 5 Jan 2023 07:46:05 +0800
+Subject: [PATCH 1/2] iscsid: clear scanning thread's PR_SET_IO_FLUSHER flag
+ (#382)
+
+commit 72949ef (iscsid: set PR_SET_IO_FLUSHER) set the iscsid's
+PR_SET_IO_FLUSHER flag to avoid deadlock. While we do not need
+to set this flag when scanning host.
+
+If this flag is set for scanning thread, we may lost devices
+reported by target because of memory allocation failure.
+
+Signed-off-by: Wenchao Hao <haowenchao@huawei.com>
+---
+ usr/iscsi_sysfs.c |  7 +++++++
+ usr/iscsi_util.c  | 27 +++++++++++++++++++++++++++
+ usr/iscsi_util.h  |  1 +
+ usr/iscsid.c      | 15 ++-------------
+ 4 files changed, 37 insertions(+), 13 deletions(-)
+
+diff --git a/usr/iscsi_sysfs.c b/usr/iscsi_sysfs.c
+index 9a591be..07fb059 100644
+--- a/usr/iscsi_sysfs.c
++++ b/usr/iscsi_sysfs.c
+@@ -40,6 +40,7 @@
+ #include "host.h"
+ #include "iscsi_err.h"
+ #include "flashnode.h"
++#include "iscsi_util.h"
+ 
+ /*
+  * TODO: remove the _DIR defines and search for subsys dirs like
+@@ -1994,6 +1995,12 @@ pid_t iscsi_sysfs_scan_host(int hostno, int async, int autoscan)
+ 		/* child */
+ 		log_debug(4, "scanning host%d", hostno);
+ 
++		/*
++		 * The return value of init_thread_io_flusher would not
++		 * affect the scan flow, so just ignore it.
++		 */
++		set_thread_io_flusher(0);
++
+ 		snprintf(id, sizeof(id), ISCSI_HOST_ID, hostno);
+ 		sysfs_set_param(id, SCSI_HOST_SUBSYS, "scan", write_buf,
+ 				strlen(write_buf));
+diff --git a/usr/iscsi_util.c b/usr/iscsi_util.c
+index 2f1de3e..2a8408c 100644
+--- a/usr/iscsi_util.c
++++ b/usr/iscsi_util.c
+@@ -30,6 +30,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/resource.h>
++#include <sys/prctl.h>
+ 
+ #include "sysdeps.h"
+ #include "log.h"
+@@ -38,6 +39,10 @@
+ #include "session_info.h"
+ #include "iscsi_util.h"
+ 
++#ifndef PR_SET_IO_FLUSHER
++#define PR_SET_IO_FLUSHER 57
++#endif
++
+ int setup_abstract_addr(struct sockaddr_un *addr, char *unix_sock_name)
+ {
+ 	memset(addr, 0, sizeof(*addr));
+@@ -392,3 +397,25 @@ int iscsi_match_target(void *data, struct session_info *info)
+ 				     info->persistent_port, NULL,
+ 				     MATCH_ANY_SID);
+ }
++
++/*
++ * set thread's PR_SET_IO_FLUSHER flag
++ *
++ * val: 1 to set to set thread's PR_SET_IO_FLUSHER flag
++ *      0 to clear thread's PR_SET_IO_FLUSHER flag
++ *
++ * return: return 0 on success, else error number is returned
++ */
++int set_thread_io_flusher(int val)
++{
++	if (prctl(PR_SET_IO_FLUSHER, val, 0, 0, 0) == 0)
++		return 0;
++
++	/*
++	 * prctl would return EINVAL if the kernel do not support PR_SET_IO_FLUSHER
++	 * so donot print error log if errorno is EINVAL to avoid unnecessary errorlog
++	 */
++	if (errno != EINVAL)
++		log_error("prctl could not %s thread's PR_SET_IO_FLUSHER flag due to error %s\n", val ? "set" : "clear", strerror(errno));
++	return errno;
++}
+diff --git a/usr/iscsi_util.h b/usr/iscsi_util.h
+index ff725eb..43889af 100644
+--- a/usr/iscsi_util.h
++++ b/usr/iscsi_util.h
+@@ -20,6 +20,7 @@ extern int __iscsi_match_session(struct node_rec *rec, char *targetname,
+ 				 char *address, int port,
+ 				 struct iface_rec *iface,
+ 				 unsigned sid);
++extern int set_thread_io_flusher(int val);
+ 
+ #define MATCH_ANY_SID 0
+ 
+diff --git a/usr/iscsid.c b/usr/iscsid.c
+index 0cf2368..d5ea789 100644
+--- a/usr/iscsid.c
++++ b/usr/iscsid.c
+@@ -34,7 +34,6 @@
+ #include <sys/wait.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+-#include <sys/prctl.h>
+ #ifndef	NO_SYSTEMD
+ #include <systemd/sd-daemon.h>
+ #endif
+@@ -57,10 +56,6 @@
+ #include "iscsid_req.h"
+ #include "iscsi_err.h"
+ 
+-#ifndef PR_SET_IO_FLUSHER
+-#define PR_SET_IO_FLUSHER 57
+-#endif
+-
+ /* global config info */
+ struct iscsi_daemon_config daemon_config;
+ struct iscsi_daemon_config *dconfig = &daemon_config;
+@@ -630,14 +625,8 @@ int main(int argc, char *argv[])
+ 		exit(ISCSI_ERR);
+ 	}
+ 
+-	if (prctl(PR_SET_IO_FLUSHER, 1, 0, 0, 0) == -1) {
+-		if (errno == EINVAL) {
+-			log_info("prctl could not mark iscsid with the PR_SET_IO_FLUSHER flag, because the feature is not supported in this kernel. Will proceed, but iscsid may hang during session level recovery if memory is low.\n");
+-		} else {
+-			log_error("prctl could not mark iscsid with the PR_SET_IO_FLUSHER flag due to error %s\n",
+-				  strerror(errno));
+-		}
+-	}
++	if (set_thread_io_flusher(1) == EINVAL)
++		log_info("prctl could not mark iscsid with the PR_SET_IO_FLUSHER flag, because the feature is not supported in this kernel. Will proceed, but iscsid may hang during session level recovery if memory is low.\n");
+ 
+ 	set_state_to_ready();
+ 	event_loop(ipc, control_fd, mgmt_ipc_fd);
+-- 
+2.35.3
+
