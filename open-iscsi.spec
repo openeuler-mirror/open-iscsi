@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.5
-Release: 10
+Release: 11
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.com
@@ -34,6 +34,7 @@ patch22: 0022-initiator_common-make-set-operational-parameter-log-.patch
 patch23: 0023-Remove-unused-fwparam_ibft.-ch-files-in-fwparam_ibft.patch
 patch24: 0024-Fix-a-possible-passing-null-pointer-in-usr-iface.c-3.patch
 patch25: 0025-iscsid-iscsiuio-fix-OOM-adjustment-377.patch
+patch26: 0026-iscsid-clear-scanning-thread-s-PR_SET_IO_FLUSHER-fla.patch
 
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
@@ -161,6 +162,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Tue Jan 17 2023 haowenchao <haowenchao@huawei.com> - 2.1.5-11
+- iscsid: clear scanning thread's PR_SET_IO_FLUSHER flag
+
 * Fri Dec 2 2022 haowenchao <haowenchao@huawei.com> - 2.1.5-10
 - Backport bugfix patches from mainline
 
