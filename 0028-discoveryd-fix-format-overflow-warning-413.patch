@@ -1,0 +1,29 @@
+From 0334727da730a3d011a8e8b350d8df2ddcf408ce Mon Sep 17 00:00:00 2001
+From: Chris Leech <cleech@redhat.com>
+Date: Mon, 17 Apr 2023 17:04:40 -0700
+Subject: [PATCH] discoveryd: fix format overflow warning (#413)
+
+This function can be called with NULL arguments, so check that before
+passing to log_error.
+
+Signed-off-by: Chris Leech <cleech@redhat.com>
+---
+ usr/discoveryd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usr/discoveryd.c b/usr/discoveryd.c
+index 08eb2bb..dd639a5 100644
+--- a/usr/discoveryd.c
++++ b/usr/discoveryd.c
+@@ -372,7 +372,7 @@ static int isns_disc_new_portals(const char *targetname, const char *iname)
+ 				       &rec_list);
+ 	if (rc) {
+ 		log_error("Could not perform iSNS DevAttrQuery for node %s.",
+-			  targetname);
++			  targetname ? targetname : "(null)");
+ 		goto free_ifaces;
+ 	}
+ 	update_sessions(&rec_list, targetname, iname);
+-- 
+2.33.0
+
