@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.5
-Release: 12
+Release: 13
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.com
@@ -36,6 +36,7 @@ patch24: 0024-Fix-a-possible-passing-null-pointer-in-usr-iface.c-3.patch
 patch25: 0025-iscsid-iscsiuio-fix-OOM-adjustment-377.patch
 patch26: 0026-iscsid-clear-scanning-thread-s-PR_SET_IO_FLUSHER-fla.patch
 patch27: 0027-iscsid-stop-connection-for-recovery-if-error-is-not-.patch
+patch28: 0028-discoveryd-fix-format-overflow-warning-413.patch
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config
@@ -162,6 +163,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Sun Jun 25 2023 louhongxiang <louhongxiang@huawei.com> - 2.1.5-13
+- iscsid: fix format overflow warning.
+
 * Tue Jan 17 2023 haowenchao <haowenchao@huawei.com> - 2.1.5-12
 - iscsid: stop connection for recovery if error is not timeout in iscsi_login_eh
 
