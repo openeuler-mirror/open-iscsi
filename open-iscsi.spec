@@ -4,7 +4,7 @@
 
 Name:    open-iscsi
 Version: 2.1.5
-Release: 12
+Release: 13
 Summary: ISCSI software initiator daemon and utility programs
 License: GPLv2+ and BSD
 URL:     http://www.open-iscsi.com
@@ -36,6 +36,9 @@ patch24: 0024-Fix-a-possible-passing-null-pointer-in-usr-iface.c-3.patch
 patch25: 0025-iscsid-iscsiuio-fix-OOM-adjustment-377.patch
 patch26: 0026-iscsid-clear-scanning-thread-s-PR_SET_IO_FLUSHER-fla.patch
 patch27: 0027-iscsid-stop-connection-for-recovery-if-error-is-not-.patch
+%if "%toolchain" == "clang"
+patch28: fix-clang.patch
+%endif
 
 BuildRequires: flex bison doxygen kmod-devel systemd-units gcc git isns-utils-devel systemd-devel
 BuildRequires: autoconf automake libtool libmount-devel openssl-devel pkg-config
@@ -90,8 +93,13 @@ This contains man files for the using of %{name}.
 perl -i -pe 's|^exec_prefix = /$|exec_prefix = %{_exec_prefix}|' Makefile
 
 %build
-%make_build OPTFLAGS="%{optflags} %{?__global_ldflags} -DUSE_KMOD -lkmod" LIB_DIR=%{_libdir}
-
+%if "%toolchain" == "clang"
+	export CFLAGS="$CFLAGS -Wno-error=gnu-variable-sized-type-not-at-end"
+	export CXXFLAGS="$CXXFLAGS -Wno-error=gnu-variable-sized-type-not-at-end"
+	%make_build OPTFLAGS="%{optflags}" LIB_DIR=%{_libdir}
+%else
+	%make_build OPTFLAGS="%{optflags} %{?__global_ldflags} -DUSE_KMOD -lkmod" LIB_DIR=%{_libdir}
+%endif
 
 %install
 make DESTDIR=%{?buildroot} LIB_DIR=%{_libdir} \
@@ -162,6 +170,9 @@ fi
 %{_mandir}/man8/*
 
 %changelog
+* Sun Jul 16 2023 yoo <sunyuechi@iscas.ac.cn> - 2.1.5-13
+- fix clang build error
+
 * Tue Jan 17 2023 haowenchao <haowenchao@huawei.com> - 2.1.5-12
 - iscsid: stop connection for recovery if error is not timeout in iscsi_login_eh
 
