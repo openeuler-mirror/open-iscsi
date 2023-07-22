@@ -1,0 +1,12 @@
+diff -u -r open-iscsi-2.1.5/usr/Makefile open-iscsi-2.1.5/usr/Makefile
+--- open-iscsi-2.1.5/usr/Makefile	2021-09-06 07:32:54.000000000 +0800
++++ open-iscsi-2.1.5/usr/Makefile	2023-07-16 14:42:47.000000000 +0800
+@@ -35,7 +35,7 @@
+ PKG_CONFIG = /usr/bin/pkg-config
+ 
+ CFLAGS ?= -O2 -g
+-WARNFLAGS ?= -Wall -Wextra -Werror -Wstrict-prototypes -fno-common
++WARNFLAGS ?= -Wall -Wextra -Wstrict-prototypes -fno-common
+ CFLAGS += $(WARNFLAGS) -I../include -I. -D_GNU_SOURCE \
+ 	  -I$(TOPDIR)/libopeniscsiusr
+ CFLAGS += $(shell $(PKG_CONFIG) --cflags libkmod)
